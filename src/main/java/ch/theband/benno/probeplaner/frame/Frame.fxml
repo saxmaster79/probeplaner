@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="ch.theband.benno.probeplaner.frame.FramePresenter">
+	<top>
+		<MenuBar BorderPane.alignment="CENTER">
+			<menus>
+				<Menu text="%file">
+					<items>
+						<MenuItem onAction="#doNew" text="%new" >
+							<accelerator>
+								<KeyCodeCombination control="DOWN" code="N" alt="UP" meta="UP" shift="UP" shortcut="UP" />
+							</accelerator>
+						</MenuItem>
+						<MenuItem onAction="#open" text="%open">
+							<accelerator>
+								<KeyCodeCombination control="DOWN" code="O" alt="UP" meta="UP" shift="UP" shortcut="UP" />
+							</accelerator>
+						</MenuItem>
+						<MenuItem onAction="#save" text="%save" >
+							<accelerator>
+								<KeyCodeCombination control="DOWN" code="S" alt="UP" meta="UP" shift="UP" shortcut="UP" />
+							</accelerator>
+						</MenuItem>
+						<MenuItem onAction="#saveAs" text="%saveAs" >
+						</MenuItem>
+						<MenuItem onAction="#doImport" text="%importfromclipboard" />
+						<SeparatorMenuItem />
+						<MenuItem onAction="#doExit" text="%exit">
+							<accelerator>
+								<KeyCodeCombination alt="DOWN" code="F4"
+									control="UP" meta="UP" shift="UP" shortcut="UP" />
+							</accelerator>
+						</MenuItem>
+					</items>
+				</Menu>
+				<Menu text="Help">
+					<items>
+						<MenuItem text="About" />
+					</items>
+				</Menu>
+			</menus>
+		</MenuBar>
+	</top>
+	<center>
+		<SplitPane dividerPositions="0.2" orientation="HORIZONTAL"
+			BorderPane.alignment="CENTER">
+			<items>
+				<VBox fx:id="east" />
+				<SplitPane dividerPositions="0.8" orientation="VERTICAL">
+					<items>
+						<VBox fx:id="north" />
+						<VBox fx:id="south" />
+					</items>
+				</SplitPane>
+
+			</items>
+		</SplitPane>
+	</center>
+</BorderPane>
