@@ -84,6 +84,7 @@ public class LinesTablePresenter {
 
 			if (row != null && row.getLines().get(title) != null) {
 				simpleIntegerProperty = new SimpleIntegerProperty(row.getLines().get(title));
+				simpleIntegerProperty.addListener((observable, oldValue, newValue) -> row.getLines().put(title, (Integer) newValue));
 			} else {
 				simpleIntegerProperty = new SimpleIntegerProperty();
 			}

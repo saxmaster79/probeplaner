@@ -5,6 +5,7 @@ import java.io.File;
 import javax.inject.Inject;
 
 import ch.theband.benno.probeplaner.ProbePlanerModel;
+import ch.theband.benno.probeplaner.rehearsals.RehearsalsView;
 import ch.theband.benno.probeplaner.service.OpenService;
 import ch.theband.benno.probeplaner.service.PdfFileExtractor;
 import ch.theband.benno.probeplaner.service.SaveService;
@@ -38,9 +39,17 @@ public class FramePresenter {
 	ProbePlanerModel model;
 	@Inject
 	LinesTableView northView;
+//	@Inject
+	RehearsalsView rehearsalsView;
+
+	public FramePresenter() {
+		super();
+	}
 
 	public void initialize() {
 		north.getChildren().add(northView.getView());
+		rehearsalsView=new RehearsalsView();
+		east.getChildren().add(rehearsalsView.getView());
 		chooser.setInitialDirectory(new File("."));
 	}
 

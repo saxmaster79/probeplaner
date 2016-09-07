@@ -7,7 +7,7 @@
 
 <VBox xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.theband.benno.probeplaner.treetable.LinesTablePresenter">
    <children>
-      <TreeTableView fx:id="treeTable" tableMenuButtonVisible="true" editable="true">
+      <TreeTableView fx:id="treeTable" tableMenuButtonVisible="true" editable="false">
         <columns>
           <TreeTableColumn fx:id="name" prefWidth="121.0" sortable="false" editable="true" text="" />
         </columns>
