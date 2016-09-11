@@ -20,7 +20,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 		Platform.runLater(() -> {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Exception Dialog");
-			alert.setHeaderText("Look, an Exception Dialog");
+			alert.setHeaderText("Fehler");
 			alert.setContentText(ex.getLocalizedMessage());
 			alert.setOnHidden(x -> System.exit(-1));
 
