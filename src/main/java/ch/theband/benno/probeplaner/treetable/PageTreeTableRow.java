@@ -15,4 +15,7 @@ public class PageTreeTableRow extends TreeTableRow {
 		return "S " + page.getNumber();
 	}
 
+	public Page getPage() {
+		return page;
+	}
 }

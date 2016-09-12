@@ -5,7 +5,7 @@ import java.io.Serializable;
 public abstract class PartOfPlay implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private final int number;
+	protected int number;
 	private String name;
 
 	public PartOfPlay(int number, String name) {

@@ -15,4 +15,8 @@ public class Scene extends PartOfPlay {
 	public List<Page> getPages() {
 		return pages;
 	}
+
+	public void setNumber(int number){
+		this.number=number;
+	}
 }

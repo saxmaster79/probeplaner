@@ -7,14 +7,15 @@
 
 <VBox xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.theband.benno.probeplaner.treetable.LinesTablePresenter">
    <children>
-      <TreeTableView fx:id="treeTable" tableMenuButtonVisible="true" editable="false">
+      <TreeTableView fx:id="treeTable" editable="false" tableMenuButtonVisible="true">
         <columns>
-          <TreeTableColumn fx:id="name" prefWidth="121.0" sortable="false" editable="true" text="" />
+          <TreeTableColumn fx:id="name" editable="true" prefWidth="121.0" sortable="false" text="" />
         </columns>
          <contextMenu>
             <ContextMenu>
               <items>
-                <MenuItem  onAction="#createRehearsal" text="%createRehearsal" />
+                  <MenuItem mnemonicParsing="false" onAction="#createScene" onMenuValidation="#isCreateSceneVisible" text="%createScene" />
+                <MenuItem onAction="#createRehearsal" text="%createRehearsal" />
                   <MenuItem onAction="#delete" text="%delete" />
               </items>
             </ContextMenu>

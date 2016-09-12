@@ -34,7 +34,7 @@ public class PdfFileExtractor extends Service<Play> {
 
     public PdfFileExtractor() {
         this("C:\\Users\\benno.bennoCompi\\Dropbox\\Georgsbühne\\No Body Like Jimmy.pdf", 5,
-                ImmutableSet.copyOf(Collections2.transform(Arrays.asList("Harri", "Rolf", "Sarah", "Bobi", "Nick", "Jimmy", "Manuel",  "Fabienne", "Viola", "Schöttli"), Role::new)));
+                ImmutableSet.copyOf(Collections2.transform(Arrays.asList("Harri", "Rolf", "Sarah", "Bobi", "Diana", "Nick", "Jimmy", "Manuel", "Fabienne", "Viola", "Schöttli"), Role::new)));
     }
 
     public PdfFileExtractor(String path, int pageOffset, Set<Role> roles) {
@@ -44,12 +44,11 @@ public class PdfFileExtractor extends Service<Play> {
     }
 
 
-
     private List<Act> convert(Multimap<Integer, Page> pages) {
         Act act = new Act(1, "1. Akt");
         int previousPage = -1;
-        int sceneNumber = 0;
-        Scene scene = new Scene(sceneNumber, ". Szene");
+        int sceneNumber = 1;
+        Scene scene = new Scene(sceneNumber, sceneNumber + ". Szene");
         act.getScenes().add(scene);//first scene is usually garbage...
         for (Entry<Integer, Page> entry : pages.entries()) {
             ch.theband.benno.probeplaner.model.Page page = new ch.theband.benno.probeplaner.model.Page(entry.getKey());
@@ -92,6 +91,7 @@ public class PdfFileExtractor extends Service<Play> {
                 List<Act> acts = convert(pages);
                 return new Play("No Body Like Jimmy", roles, acts);
             }
+
             Multimap<Integer, Page> processDoc() throws IOException {
                 System.out.println(path);
                 // Reads in pdf document
@@ -102,7 +102,7 @@ public class PdfFileExtractor extends Service<Play> {
                 // rows.add(SZENE);
                 // rows.add(SEITE);
                 rows.addAll(roles.stream().map(x -> x.getName()).collect(Collectors.toList()));
-                int count=0;
+                int count = 0;
                 for (Role role : roles) {
                     String name = role.getName() + ":";
                     for (int i = pageOffset; i <= numberOfPages; i++) {
