@@ -73,7 +73,7 @@ public class Play implements Serializable {
 		correctAllSceneNumbers();
 	}
 
-    private void correctAllSceneNumbers() {
+    public void correctAllSceneNumbers() {
         for (Act act:acts){
             for (int i = 0; i < act.getScenes().size(); i++) {
                 act.getScenes().get(i).setNumber(i+1);

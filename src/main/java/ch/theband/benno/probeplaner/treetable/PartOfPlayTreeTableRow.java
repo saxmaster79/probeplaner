@@ -4,7 +4,7 @@ import ch.theband.benno.probeplaner.model.PartOfPlay;
 
 public class PartOfPlayTreeTableRow extends TreeTableRow {
 
-	private PartOfPlay part;
+	private final PartOfPlay part;
 
 	public PartOfPlayTreeTableRow(PartOfPlay part) {
 		this.part = part;
@@ -19,4 +19,14 @@ public class PartOfPlayTreeTableRow extends TreeTableRow {
 		part.setName(name);
 	}
 
+	public PartOfPlay getPart() {
+		return part;
+	}
+
+	@Override
+	public String toString() {
+		return "PartOfPlayTreeTableRow{" +
+				"part=" + part +
+				'}';
+	}
 }

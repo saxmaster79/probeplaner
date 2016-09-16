@@ -19,4 +19,15 @@ public class Scene extends PartOfPlay {
 	public void setNumber(int number){
 		this.number=number;
 	}
+
+	public Scene copy(){
+	    return new Scene(number, getName());
+    }
+
+	@Override
+	public String toString() {
+		return "Scene{" +
+				"pages=" + pages +
+				'}';
+	}
 }

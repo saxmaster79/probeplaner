@@ -30,4 +30,10 @@ public abstract class TreeTableRow {
 		this.showValues = showValues;
 
 	}
+	@Override
+	public String toString() {
+		return "PageTreeTableRow{" +
+				getName() +
+				'}';
+	}
 }

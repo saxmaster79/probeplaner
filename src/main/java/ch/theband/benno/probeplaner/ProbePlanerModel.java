@@ -1,16 +1,18 @@
 package ch.theband.benno.probeplaner;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import ch.theband.benno.probeplaner.model.*;
 import ch.theband.benno.probeplaner.treetable.PageTreeTableRow;
+import ch.theband.benno.probeplaner.treetable.PartOfPlayTreeTableRow;
 import ch.theband.benno.probeplaner.treetable.TreeTableRow;
+import com.google.common.collect.ImmutableList;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
 public class ProbePlanerModel {
@@ -41,15 +43,86 @@ public class ProbePlanerModel {
         return savedFile;
     }
 
-    public boolean createScene(List<TreeItem<TreeTableRow>> items) {
-        if (items.stream().map(TreeItem::getValue).filter(row -> (!(row instanceof PageTreeTableRow))).findAny().isPresent()) {
+    public boolean createScene(List<TreeItem<TreeTableRow>> items, TreeItem<TreeTableRow> root) {
+        if (!onlyPages(items)) {
             return false;
         }
+        if (items.isEmpty()) return false;
 
-        List<Page> pages = items.stream().map(TreeItem::getValue).map(row -> (PageTreeTableRow) row).map(pttr -> pttr.getPage()).collect(Collectors.toList());
-        play.getValue().createScene(pages);
+        assertConsecutive(items);
+
+        TreeItem<TreeTableRow> firstPageItem = items.get(0);
+        TreeItem<TreeTableRow> sceneItem = firstPageItem.getParent();
+
+        final int startIndex = sceneItem.getChildren().indexOf(firstPageItem);
+        if (startIndex < 0) throw new IllegalStateException("Index not found!!!");
+
+        PartOfPlayTreeTableRow oldSceneRow = (PartOfPlayTreeTableRow) sceneItem.getValue();
+        Scene oldScene = (Scene) oldSceneRow.getPart();
+
+        TreeItem<TreeTableRow> actItem = sceneItem.getParent();
+        if (startIndex == 0) {
+            //new scene starting at the beginning of the scene
+        } else {
+            Scene newScene = oldScene.copy();
+            PartOfPlayTreeTableRow newSceneRow = new PartOfPlayTreeTableRow(newScene);
+
+            TreeItem<TreeTableRow> first = new TreeItem<TreeTableRow>(newSceneRow);
+            first.setExpanded(true);
+            List<Page> sublist = oldScene.getPages().subList(0, startIndex);
+            newScene.getPages().addAll(sublist);
+            oldScene.getPages().removeAll(sublist);
+
+            List<TreeItem<TreeTableRow>> itemSublist = ImmutableList.copyOf(sceneItem.getChildren().subList(0, startIndex));
+            sceneItem.getChildren().removeAll(itemSublist);
+            first.getChildren().addAll(itemSublist);
+
+
+            List<TreeItem<TreeTableRow>> sceneNodes = actItem.getChildren();
+            sceneNodes.add(sceneNodes.indexOf(sceneItem), first);
+            List<Scene> scenes = ((Act) ((PartOfPlayTreeTableRow) actItem.getValue()).getPart()).getScenes();
+            scenes.add(scenes.indexOf(oldScene), newScene);
+
+        }
+        final int endIndex = sceneItem.getChildren().indexOf(items.get(items.size() - 1));
+
+        if (endIndex == sceneItem.getChildren().size() - 1) {
+            //new scene ending at the end of the scene
+        } else {
+
+            Scene last = oldScene.copy();
+            PartOfPlayTreeTableRow newSceneRow = new PartOfPlayTreeTableRow(last);
+            TreeItem<TreeTableRow> lastItem = new TreeItem<>(newSceneRow);
+            lastItem.setExpanded(true);
+            List<Page> subList = oldScene.getPages().subList(endIndex + 1, oldScene.getPages().size());
+            last.getPages().addAll(subList);
+            oldScene.getPages().removeAll(subList);
+
+            List<TreeItem<TreeTableRow>> itemSublist = ImmutableList.copyOf(sceneItem.getChildren().subList(endIndex + 1, sceneItem.getChildren().size()));
+            sceneItem.getChildren().removeAll(itemSublist);
+            lastItem.getChildren().addAll(itemSublist);
+
+
+            List<TreeItem<TreeTableRow>> allNodes = actItem.getChildren();
+            allNodes.add(allNodes.indexOf(sceneItem) + 1, lastItem);
+            List<Scene> scenes = ((Act) ((PartOfPlayTreeTableRow) actItem.getValue()).getPart()).getScenes();
+            scenes.add(scenes.indexOf(oldScene) + 1, last);
+
+        }
+
+        //play.getValue().correctAllSceneNumbers();
+        //List<Page> pages = items.stream().map(TreeItem::getValue).map(row -> (PageTreeTableRow) row).map(pttr -> pttr.getPage()).collect(Collectors.toList());
+        //play.getValue().createScene(pages);
 
         return true;
+    }
+
+    private void assertConsecutive(List<TreeItem<TreeTableRow>> items) {
+    }
+
+    public boolean onlyPages(List<TreeItem<TreeTableRow>> items) {
+        boolean otherItemsPresent = items.stream().map(TreeItem::getValue).filter(row -> (!(row instanceof PageTreeTableRow))).findAny().isPresent();
+        return !otherItemsPresent;
     }
 
 }

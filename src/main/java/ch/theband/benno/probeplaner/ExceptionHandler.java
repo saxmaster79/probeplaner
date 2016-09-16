@@ -22,7 +22,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 			alert.setTitle("Exception Dialog");
 			alert.setHeaderText("Fehler");
 			alert.setContentText(ex.getLocalizedMessage());
-			alert.setOnHidden(x -> System.exit(-1));
+			//alert.setOnHidden(x -> System.exit(-1));
 
 			// Create expandable Exception.
 			StringWriter sw = new StringWriter();

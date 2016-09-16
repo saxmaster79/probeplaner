@@ -13,15 +13,10 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.*;
 import javafx.scene.control.TreeTableColumn.CellDataFeatures;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
@@ -35,6 +30,10 @@ public class LinesTablePresenter {
     private TreeTableView<TreeTableRow> treeTable;
     @FXML
     private TreeTableColumn<TreeTableRow, String> name;
+    @FXML
+    private MenuItem createScene;
+    @FXML
+    private MenuItem delete;
 
     @Inject
     ProbePlanerModel model;
@@ -98,6 +97,24 @@ public class LinesTablePresenter {
         };
     }
 
+    @FXML
+    public void adjustContextMenu() {
+        System.out.println("adjustContextMEnu");
+    }
+
+    @FXML
+    public void adjustContextMenu(Event event) {
+        List<TreeItem<TreeTableRow>> selectedItems = getSelectedItems();
+        createScene.setVisible(!selectedItems.isEmpty()&&model.onlyPages(selectedItems));
+        delete.setVisible(!selectedItems.isEmpty());
+    }
+
+    private List<TreeItem<TreeTableRow>> getSelectedItems(){
+        TreeTableViewSelectionModel<TreeTableRow> sel = treeTable.getSelectionModel();
+        return sel.getSelectedItems();
+
+    }
+
     private static final class BlueIntegerTableCell extends TextFieldTreeTableCell<TreeTableRow, Number> {
         BlueIntegerTableCell() {
             super(createConverter());
@@ -142,22 +159,15 @@ public class LinesTablePresenter {
     @FXML
     public void createScene() {
         List<TreeItem<TreeTableRow>> items = treeTable.getSelectionModel().getSelectedItems();
-        model.createScene(items);
-        createTreeTable(model.getPlay());
-    }
 
-    @FXML
-    public EventHandler<Event> isCreateSceneVisible() {
-        System.out.println("isCreateSceneVisible");
-        return e -> {
-            System.out.println("isCreateSceneVisible EventHandler" + e);
-        };
+           model.createScene(items, treeTable.getRoot());
+
     }
 
     @FXML
     public void delete() {
         TreeTableViewSelectionModel<TreeTableRow> sel = treeTable.getSelectionModel();
-        for (TreeItem<TreeTableRow> item : ImmutableList.copyOf(sel.getSelectedItems())) {
+        for (TreeItem<TreeTableRow> item : sel.getSelectedItems()) {
             if (item != null) {
                 item.getParent().getChildren().remove(item);
             }

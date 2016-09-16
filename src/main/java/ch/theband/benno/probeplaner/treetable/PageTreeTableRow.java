@@ -18,4 +18,6 @@ public class PageTreeTableRow extends TreeTableRow {
 	public Page getPage() {
 		return page;
 	}
+
+
 }

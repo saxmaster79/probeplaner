@@ -22,4 +22,11 @@ public class Page implements Serializable {
 		return lines;
 	}
 
+	@Override
+	public String toString() {
+		return "Page{" +
+				"number=" + number +
+				", lines=" + lines +
+				'}';
+	}
 }
