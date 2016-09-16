@@ -7,7 +7,7 @@ import com.google.common.collect.Maps;
 
 public abstract class TreeTableRow {
 
-	private final Map<String, Integer> lines;
+	private Map<String, Integer> lines;
 	private boolean showValues = true;
 
 	public TreeTableRow() {
@@ -35,5 +35,9 @@ public abstract class TreeTableRow {
 		return "PageTreeTableRow{" +
 				getName() +
 				'}';
+	}
+
+	public void setLines(Map<String,Integer> lines) {
+		this.lines = lines;
 	}
 }

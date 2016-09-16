@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ch.theband.benno.probeplaner.model.*;
+import ch.theband.benno.probeplaner.treetable.LineFactory;
 import ch.theband.benno.probeplaner.treetable.PageTreeTableRow;
 import ch.theband.benno.probeplaner.treetable.PartOfPlayTreeTableRow;
 import ch.theband.benno.probeplaner.treetable.TreeTableRow;
@@ -14,6 +15,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import javafx.scene.shape.Line;
 
 public class ProbePlanerModel {
     private final SimpleObjectProperty<Play> play = new SimpleObjectProperty<>();
@@ -55,7 +57,8 @@ public class ProbePlanerModel {
         TreeItem<TreeTableRow> sceneItem = firstPageItem.getParent();
 
         final int startIndex = sceneItem.getChildren().indexOf(firstPageItem);
-        if (startIndex < 0) throw new IllegalStateException("Index not found!!!");
+        int endIndex = sceneItem.getChildren().indexOf(items.get(items.size() - 1));
+        if (startIndex < 0) throw new IllegalStateException("startIndex not found!!!");
 
         PartOfPlayTreeTableRow oldSceneRow = (PartOfPlayTreeTableRow) sceneItem.getValue();
         Scene oldScene = (Scene) oldSceneRow.getPart();
@@ -66,9 +69,8 @@ public class ProbePlanerModel {
         } else {
             Scene newScene = oldScene.copy();
             PartOfPlayTreeTableRow newSceneRow = new PartOfPlayTreeTableRow(newScene);
-
             TreeItem<TreeTableRow> first = new TreeItem<TreeTableRow>(newSceneRow);
-            first.setExpanded(true);
+            addEventHandlers(newSceneRow, first);
             List<Page> sublist = oldScene.getPages().subList(0, startIndex);
             newScene.getPages().addAll(sublist);
             oldScene.getPages().removeAll(sublist);
@@ -76,7 +78,9 @@ public class ProbePlanerModel {
             List<TreeItem<TreeTableRow>> itemSublist = ImmutableList.copyOf(sceneItem.getChildren().subList(0, startIndex));
             sceneItem.getChildren().removeAll(itemSublist);
             first.getChildren().addAll(itemSublist);
+            endIndex = endIndex - itemSublist.size();
 
+            LineFactory.sumUpChildren(first);
 
             List<TreeItem<TreeTableRow>> sceneNodes = actItem.getChildren();
             sceneNodes.add(sceneNodes.indexOf(sceneItem), first);
@@ -84,7 +88,7 @@ public class ProbePlanerModel {
             scenes.add(scenes.indexOf(oldScene), newScene);
 
         }
-        final int endIndex = sceneItem.getChildren().indexOf(items.get(items.size() - 1));
+
 
         if (endIndex == sceneItem.getChildren().size() - 1) {
             //new scene ending at the end of the scene
@@ -93,7 +97,7 @@ public class ProbePlanerModel {
             Scene last = oldScene.copy();
             PartOfPlayTreeTableRow newSceneRow = new PartOfPlayTreeTableRow(last);
             TreeItem<TreeTableRow> lastItem = new TreeItem<>(newSceneRow);
-            lastItem.setExpanded(true);
+            addEventHandlers(newSceneRow, lastItem);
             List<Page> subList = oldScene.getPages().subList(endIndex + 1, oldScene.getPages().size());
             last.getPages().addAll(subList);
             oldScene.getPages().removeAll(subList);
@@ -102,19 +106,26 @@ public class ProbePlanerModel {
             sceneItem.getChildren().removeAll(itemSublist);
             lastItem.getChildren().addAll(itemSublist);
 
+            LineFactory.sumUpChildren(lastItem);
+
 
             List<TreeItem<TreeTableRow>> allNodes = actItem.getChildren();
             allNodes.add(allNodes.indexOf(sceneItem) + 1, lastItem);
             List<Scene> scenes = ((Act) ((PartOfPlayTreeTableRow) actItem.getValue()).getPart()).getScenes();
             scenes.add(scenes.indexOf(oldScene) + 1, last);
-
         }
+        LineFactory.sumUpChildren(sceneItem);
+        play.getValue().correctAllSceneNumbers();
 
-        //play.getValue().correctAllSceneNumbers();
-        //List<Page> pages = items.stream().map(TreeItem::getValue).map(row -> (PageTreeTableRow) row).map(pttr -> pttr.getPage()).collect(Collectors.toList());
-        //play.getValue().createScene(pages);
 
         return true;
+    }
+
+
+    private void addEventHandlers(PartOfPlayTreeTableRow row, TreeItem<TreeTableRow> item) {
+        LineFactory.addEventHandlers(row, item);
+        item.setExpanded(true);
+        row.setShowValues(false);
     }
 
     private void assertConsecutive(List<TreeItem<TreeTableRow>> items) {

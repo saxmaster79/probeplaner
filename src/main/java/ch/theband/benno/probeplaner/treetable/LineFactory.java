@@ -64,13 +64,16 @@ public class LineFactory extends Service<TreeItem<TreeTableRow>> {
 		addEventHandlers(value, treeItem);
 	}
 
-	private void sumUpChildren(TreeItem<TreeTableRow> treeItem) {
+	public static void sumUpChildren(TreeItem<TreeTableRow> treeItem) {
 		Stream<Entry<String, Integer>> flatMap = treeItem.getChildren().stream().flatMap(item -> item.getValue().getLines().entrySet().stream());
 		Map<String, Integer> map = flatMap.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (t, u) -> t + u));
-		treeItem.getValue().getLines().putAll(map);
+
+		TreeTableRow treeTableRow = treeItem.getValue();
+
+		treeTableRow.setLines(map);
 	}
 
-	private void addEventHandlers(TreeTableRow value, TreeItem<TreeTableRow> treeItem) {
+	public static void addEventHandlers(TreeTableRow value, TreeItem<TreeTableRow> treeItem) {
 		treeItem.addEventHandler(TreeItem.branchExpandedEvent(), evt -> {
 			if (treeItem.equals(evt.getSource())) {
 				value.setShowValues(false);
