@@ -153,13 +153,12 @@ public class LinesTablePresenter {
 
     @FXML
     public void createRehearsal() {
-        System.out.println(treeTable.getSelectionModel().getSelectedItems());
+        model.createRehearsal(treeTable.getSelectionModel().getSelectedItems());
     }
 
     @FXML
     public void createScene() {
         List<TreeItem<TreeTableRow>> items = treeTable.getSelectionModel().getSelectedItems();
-
            model.createScene(items, treeTable.getRoot());
 
     }

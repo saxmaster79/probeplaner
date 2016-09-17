@@ -13,9 +13,7 @@ import ch.theband.benno.probeplaner.treetable.TreeTableRow;
 import com.google.common.collect.ImmutableList;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-import javafx.scene.shape.Line;
 
 public class ProbePlanerModel {
     private final SimpleObjectProperty<Play> play = new SimpleObjectProperty<>();
@@ -136,4 +134,16 @@ public class ProbePlanerModel {
         return !otherItemsPresent;
     }
 
+    public List<PartOfPlay> createRehearsal(List<TreeItem<TreeTableRow>> selectedItems) {
+        List<TreeTableRow> rows = selectedItems.stream().map(item -> item.getValue()).collect(Collectors.toList());
+        List<PartOfPlay> parts=new ArrayList<>();
+        for (TreeTableRow row : rows) {
+            if (row instanceof PageTreeTableRow) {
+                System.err.println("Not yet implemented:::: PageTreeTableRow");
+            } else if (row instanceof PartOfPlayTreeTableRow) {
+                parts.add( ((PartOfPlayTreeTableRow)row).getPart());
+            }
+        }
+        return parts;
+    }
 }
