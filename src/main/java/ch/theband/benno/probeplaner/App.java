@@ -36,6 +36,7 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        System.out.println("java.version " +System.getProperty("java.version"));
         launch(args);
     }
 }

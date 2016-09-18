@@ -5,13 +5,12 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
-import com.google.common.collect.ImmutableList;
-
 import ch.theband.benno.probeplaner.ProbePlanerModel;
+import ch.theband.benno.probeplaner.detail.DetailPresenter;
+import ch.theband.benno.probeplaner.model.PartOfPlay;
 import ch.theband.benno.probeplaner.model.Play;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -37,6 +36,7 @@ public class LinesTablePresenter {
 
     @Inject
     ProbePlanerModel model;
+    private Callback<List<PartOfPlay>, Boolean> createRehearsal;
 
     public void initialize() {
         model.playProperty().addListener((observable, oldValue, newValue) -> createTreeTable(newValue));
@@ -105,14 +105,18 @@ public class LinesTablePresenter {
     @FXML
     public void adjustContextMenu(Event event) {
         List<TreeItem<TreeTableRow>> selectedItems = getSelectedItems();
-        createScene.setVisible(!selectedItems.isEmpty()&&model.onlyPages(selectedItems));
+        createScene.setVisible(!selectedItems.isEmpty() && model.onlyPages(selectedItems));
         delete.setVisible(!selectedItems.isEmpty());
     }
 
-    private List<TreeItem<TreeTableRow>> getSelectedItems(){
+    private List<TreeItem<TreeTableRow>> getSelectedItems() {
         TreeTableViewSelectionModel<TreeTableRow> sel = treeTable.getSelectionModel();
         return sel.getSelectedItems();
 
+    }
+
+    public void setCreateRehearsalCallback(Callback<List<PartOfPlay>, Boolean> createRehearsal) {
+        this.createRehearsal = createRehearsal;
     }
 
     private static final class BlueIntegerTableCell extends TextFieldTreeTableCell<TreeTableRow, Number> {
@@ -153,14 +157,16 @@ public class LinesTablePresenter {
 
     @FXML
     public void createRehearsal() {
-        model.createRehearsal(treeTable.getSelectionModel().getSelectedItems());
+        List<PartOfPlay> scenes = model.getScenes(treeTable.getSelectionModel().getSelectedItems());
+        createRehearsal.call(scenes);
     }
 
     @FXML
     public void createScene() {
-        List<TreeItem<TreeTableRow>> items = treeTable.getSelectionModel().getSelectedItems();
-           model.createScene(items, treeTable.getRoot());
-
+        TreeItem<TreeTableRow> selectedItem = treeTable.getSelectionModel().getSelectedItem();
+        if (selectedItem != null) {
+            model.createScene(selectedItem, treeTable.getRoot());
+        }
     }
 
     @FXML

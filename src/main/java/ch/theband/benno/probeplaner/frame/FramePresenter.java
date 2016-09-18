@@ -7,10 +7,13 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import ch.theband.benno.probeplaner.ProbePlanerModel;
+import ch.theband.benno.probeplaner.detail.DetailPresenter;
+import ch.theband.benno.probeplaner.detail.DetailView;
 import ch.theband.benno.probeplaner.rehearsals.RehearsalsView;
 import ch.theband.benno.probeplaner.service.OpenService;
 import ch.theband.benno.probeplaner.service.PdfFileExtractor;
 import ch.theband.benno.probeplaner.service.SaveService;
+import ch.theband.benno.probeplaner.treetable.LinesTablePresenter;
 import ch.theband.benno.probeplaner.treetable.LinesTableView;
 
 import javafx.application.Platform;
@@ -19,17 +22,16 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
 
 public class FramePresenter {
 
     @FXML
+    private BorderPane west;
+    @FXML
     private VBox east;
-    @FXML
-    private VBox north;
-    @FXML
-    private VBox south;
 
     private final FileChooser chooser = new FileChooser();
 
@@ -44,11 +46,14 @@ public class FramePresenter {
     @Inject
     ProbePlanerModel model;
     @Inject
-    LinesTableView northView;
+    LinesTableView linesTableView;
     @Inject
     RehearsalsView rehearsalsView;
     @Inject
     ProgressDialogView progressDialog;
+    @Inject
+    DetailView detailView;
+
     private Stage dialogStage;
 
     public FramePresenter() {
@@ -56,10 +61,11 @@ public class FramePresenter {
     }
 
     public void initialize() {
-        north.getChildren().add(northView.getView());
-        rehearsalsView = new RehearsalsView();
+        west.setCenter(linesTableView.getView());
         east.getChildren().add(rehearsalsView.getView());
         chooser.setInitialDirectory(new File("."));
+
+        ((LinesTablePresenter)linesTableView.getPresenter()).setCreateRehearsalCallback(((DetailPresenter)detailView.getPresenter())::createRehearsal);
     }
 
     @FXML
@@ -140,7 +146,7 @@ public class FramePresenter {
     }
 
     private Window getWindow() {
-        return north.getScene().getWindow();
+        return west.getScene().getWindow();
     }
 
     @FXML

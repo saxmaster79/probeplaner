@@ -1,41 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.input.*?>
-<?import javafx.scene.layout.*?>
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="ch.theband.benno.probeplaner.frame.FramePresenter">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.76-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.theband.benno.probeplaner.frame.FramePresenter">
 	<top>
 		<MenuBar BorderPane.alignment="CENTER">
 			<menus>
 				<Menu text="%file">
 					<items>
-						<MenuItem onAction="#doNew" text="%new" >
+						<MenuItem onAction="#doNew" text="%new">
 							<accelerator>
-								<KeyCodeCombination control="DOWN" code="N" alt="UP" meta="UP" shift="UP" shortcut="UP" />
+								<KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
 							</accelerator>
 						</MenuItem>
 						<MenuItem onAction="#open" text="%open">
 							<accelerator>
-								<KeyCodeCombination control="DOWN" code="O" alt="UP" meta="UP" shift="UP" shortcut="UP" />
+								<KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
 							</accelerator>
 						</MenuItem>
-						<MenuItem onAction="#save" text="%save" >
+						<MenuItem onAction="#save" text="%save">
 							<accelerator>
-								<KeyCodeCombination control="DOWN" code="S" alt="UP" meta="UP" shift="UP" shortcut="UP" />
+								<KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
 							</accelerator>
 						</MenuItem>
-						<MenuItem onAction="#saveAs" text="%saveAs" >
+						<MenuItem onAction="#saveAs" text="%saveAs">
 						</MenuItem>
 						<MenuItem onAction="#doImport" text="%importfromclipboard" />
 						<SeparatorMenuItem />
 						<MenuItem onAction="#doExit" text="%exit">
 							<accelerator>
-								<KeyCodeCombination alt="DOWN" code="F4"
-									control="UP" meta="UP" shift="UP" shortcut="UP" />
+								<KeyCodeCombination alt="DOWN" code="F4" control="UP" meta="UP" shift="UP" shortcut="UP" />
 							</accelerator>
 						</MenuItem>
 					</items>
@@ -49,17 +50,13 @@
 		</MenuBar>
 	</top>
 	<center>
-		<SplitPane dividerPositions="0.2" orientation="HORIZONTAL"
-			BorderPane.alignment="CENTER">
+		<SplitPane dividerPositions="0.8" orientation="HORIZONTAL" BorderPane.alignment="CENTER">
 			<items>
-				<VBox fx:id="east" />
-				<SplitPane dividerPositions="0.8" orientation="VERTICAL">
-					<items>
-						<VBox fx:id="north" />
-						<VBox fx:id="south" />
-					</items>
-				</SplitPane>
+				<BorderPane fx:id="west">
 
+				</BorderPane>
+
+				<VBox fx:id="east" />
 			</items>
 		</SplitPane>
 	</center>
