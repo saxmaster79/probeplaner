@@ -28,7 +28,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 public class PdfFileExtractor extends Service<Play> {
-    private Set<Role> roles;
+    private ImmutableSet<Role> roles;
     private final String path;
     private final int pageOffset;
 
@@ -37,7 +37,7 @@ public class PdfFileExtractor extends Service<Play> {
                 ImmutableSet.copyOf(Collections2.transform(Arrays.asList("Harri", "Rolf", "Sarah", "Bobi", "Diana", "Nick", "Jimmy", "Manuel", "Fabienne", "Viola", "Schöttli"), Role::new)));
     }
 
-    public PdfFileExtractor(String path, int pageOffset, Set<Role> roles) {
+    public PdfFileExtractor(String path, int pageOffset, ImmutableSet<Role> roles) {
         this.path = path;
         this.pageOffset = pageOffset;
         this.roles = roles;

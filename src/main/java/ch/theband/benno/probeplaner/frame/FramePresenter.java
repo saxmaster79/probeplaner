@@ -65,7 +65,15 @@ public class FramePresenter {
         east.getChildren().add(rehearsalsView.getView());
         chooser.setInitialDirectory(new File("."));
 
-        ((LinesTablePresenter)linesTableView.getPresenter()).setCreateRehearsalCallback(((DetailPresenter)detailView.getPresenter())::createRehearsal);
+        getLinesTablePresenter().setCreateRehearsalCallback(getDetailPresenter()::createRehearsal);
+    }
+
+    private LinesTablePresenter getLinesTablePresenter() {
+        return (LinesTablePresenter)linesTableView.getPresenter();
+    }
+
+    private DetailPresenter getDetailPresenter() {
+        return (DetailPresenter)detailView.getPresenter();
     }
 
     @FXML

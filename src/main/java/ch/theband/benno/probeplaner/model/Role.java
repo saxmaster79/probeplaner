@@ -23,4 +23,9 @@ public class Role implements Serializable {
 	public String getActor() {
 		return actor;
 	}
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

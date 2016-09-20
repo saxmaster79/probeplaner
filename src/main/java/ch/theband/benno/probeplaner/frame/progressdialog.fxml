@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<DialogPane fx:controller="ch.theband.benno.probeplaner.frame.ProgressDialogPresenter"
+            xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+    <header>
+        <Label text="%import"/>
+    </header>
+    <content>
+        <ProgressBar prefWidth="200.0" progress="0.0" fx:id="progressBar"/>
+    </content>
+</DialogPane>

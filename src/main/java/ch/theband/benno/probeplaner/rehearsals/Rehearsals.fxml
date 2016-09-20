@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<SplitPane dividerPositions="0.5" orientation="VERTICAL" xmlns="http://javafx.com/javafx/8.0.76-ea"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="ch.theband.benno.probeplaner.rehearsals.RehearsalsPresenter" fx:id="splitPane">
+    <items>
+        <ListView fx:id="rehearsals"/>
+    </items>
+</SplitPane>

@@ -1,13 +1,12 @@
 package ch.theband.benno.probeplaner.model;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Play implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -15,7 +14,7 @@ public class Play implements Serializable {
 	private final Set<Role> roles;
 	private final List<Act> acts;
 
-	public Play(String name, Set<Role> roles, List<Act> acts) {
+	public Play(String name, ImmutableSet<Role> roles, List<Act> acts) {
 		super();
 		this.name = name;
 		this.roles = roles;
@@ -45,6 +44,7 @@ public class Play implements Serializable {
         }
     }
 
-    private void assertConsecutive(List<Page> pages) {
+    public Comparator<Role> rolesComparator(){
+    	return Ordering.explicit(ImmutableList.copyOf(roles));
 	}
 }
