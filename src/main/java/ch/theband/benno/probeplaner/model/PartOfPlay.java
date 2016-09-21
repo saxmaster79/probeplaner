@@ -26,5 +26,5 @@ public abstract class PartOfPlay implements Serializable {
 		this.name = name;
 	}
 
-
+	public abstract int getNumberOfLines();
 }

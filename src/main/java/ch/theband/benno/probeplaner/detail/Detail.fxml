@@ -4,7 +4,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -25,7 +25,9 @@
         <DatePicker fx:id="date" GridPane.columnIndex="1" />
         <ComboBox fx:id="time" editable="true" GridPane.columnIndex="2" />
         <Label text="%who" GridPane.rowIndex="1" />
-        <ListView fx:id="list" prefHeight="318.0" prefWidth="226.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.rowSpan="2147483647" />
+        <TextArea fx:id="who" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+        <Label text="%remark" GridPane.rowIndex="2" />
+        <TextArea fx:id="remark" wrapText="true" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
     </children>
    <padding>
       <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />

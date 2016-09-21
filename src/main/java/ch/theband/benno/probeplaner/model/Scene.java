@@ -12,6 +12,11 @@ public class Scene extends PartOfPlay {
 		super(number, name);
 	}
 
+	@Override
+	public int getNumberOfLines() {
+		return pages.stream().flatMap(p->p.getLines().values().stream()).mapToInt(Integer::intValue).sum();
+	}
+
 	public List<Page> getPages() {
 		return pages;
 	}

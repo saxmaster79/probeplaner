@@ -1,5 +1,6 @@
 package ch.theband.benno.probeplaner.detail;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +19,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 
 import javax.inject.Inject;
 
@@ -26,7 +28,9 @@ public class DetailPresenter {
     @Inject
     ProbePlanerModel model;
     @FXML
-    private ListView<Role> list;
+    private TextArea who;
+    @FXML
+    private TextArea remark;
     @FXML
     private DatePicker date;
     @FXML
@@ -34,17 +38,19 @@ public class DetailPresenter {
 
     @FXML
     public void initialize() {
+        date.setValue(LocalDate.now());
         time.getItems().add(LocalTime.of(17, 0));
         time.getItems().add(LocalTime.of(18, 0));
         time.getItems().add(LocalTime.of(18, 30));
         time.getItems().add(LocalTime.of(19, 0));
         time.getItems().add(LocalTime.of(19, 30));
+        time.setValue(LocalTime.of(19, 30));
     }
 
     public boolean createRehearsal(List<PartOfPlay> scenes) {
         Stream<Role> roles = scenes.stream().filter(part -> part instanceof Scene).map(part -> (Scene) part).flatMap(scene -> scene.getPages().stream()).flatMap(page -> page.getLines().entrySet().stream()).filter(e -> e.getValue() != null && e.getValue() > 0).map(e -> e.getKey());
-        list.getItems().clear();
-        list.getItems().addAll(roles.collect(Collectors.toCollection(()->new TreeSet<>(model.getPlay().rolesComparator()))));
+        who.clear();
+        who.setText(roles.distinct().sorted(model.getPlay().rolesComparator()).map(Role::getName).collect(Collectors.joining(", ")));
         return true;
     }
 }

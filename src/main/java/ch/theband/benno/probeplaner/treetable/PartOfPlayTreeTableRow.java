@@ -12,7 +12,8 @@ public class PartOfPlayTreeTableRow extends TreeTableRow {
 
 	@Override
 	public String getName() {
-		return part.getName();
+		return part.getName()+" (" +part.getNumberOfLines()+
+				")";
 	}
 
 	public void setName(String name) {

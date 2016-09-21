@@ -13,6 +13,11 @@ public class Act extends PartOfPlay {
 		super(number, name);
 	}
 
+	@Override
+	public int getNumberOfLines() {
+		return scenes.stream().mapToInt(scene -> scene.getNumberOfLines()).sum();
+	}
+
 	public List<Scene> getScenes() {
 		return scenes;
 	}
