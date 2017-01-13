@@ -1,14 +1,13 @@
 package ch.theband.benno.probeplaner;
 
-import com.airhacks.afterburner.injection.Injector;
-
 import ch.theband.benno.probeplaner.frame.FrameView;
+import com.airhacks.afterburner.injection.Injector;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- * @author adam-bien.com
+ * @author Benno
  */
 public class App extends Application {
 

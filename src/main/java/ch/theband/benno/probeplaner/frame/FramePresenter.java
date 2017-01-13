@@ -1,11 +1,5 @@
 package ch.theband.benno.probeplaner.frame;
 
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.inject.Inject;
-
 import ch.theband.benno.probeplaner.ProbePlanerModel;
 import ch.theband.benno.probeplaner.detail.DetailPresenter;
 import ch.theband.benno.probeplaner.detail.DetailView;
@@ -15,7 +9,6 @@ import ch.theband.benno.probeplaner.service.PdfFileExtractor;
 import ch.theband.benno.probeplaner.service.SaveService;
 import ch.theband.benno.probeplaner.treetable.LinesTablePresenter;
 import ch.theband.benno.probeplaner.treetable.LinesTableView;
-
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -25,6 +18,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FramePresenter {
 
@@ -147,6 +145,7 @@ public class FramePresenter {
             openService.setFile(file);
             openService.start();
             openService.setOnSucceeded(evt -> {
+                model.setPlay(null);
                 model.setPlay(openService.getValue());
                 model.setSavedFile(file);
             });
@@ -159,7 +158,7 @@ public class FramePresenter {
 
     @FXML
     public void doNew() {
-        // model.setPlay(new Play(name, roles, acts));
+        model.setPlay(null);
     }
 
     @FXML

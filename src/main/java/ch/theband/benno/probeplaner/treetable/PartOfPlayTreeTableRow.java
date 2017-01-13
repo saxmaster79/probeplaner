@@ -4,30 +4,27 @@ import ch.theband.benno.probeplaner.model.PartOfPlay;
 
 public class PartOfPlayTreeTableRow extends TreeTableRow {
 
-	private final PartOfPlay part;
+    private final PartOfPlay part;
 
-	public PartOfPlayTreeTableRow(PartOfPlay part) {
-		this.part = part;
-	}
+    public PartOfPlayTreeTableRow(PartOfPlay part) {
+        this.part = part;
+        updateName();
+    }
 
-	@Override
-	public String getName() {
-		return part.getName()+" (" +part.getNumberOfLines()+
-				")";
-	}
+    @Override
+    protected void updateName() {
+        setName(part.getName() + " (" + lines.values().stream().mapToInt(Integer::intValue).sum() +
+                ")");
+    }
 
-	public void setName(String name) {
-		part.setName(name);
-	}
+    public PartOfPlay getPart() {
+        return part;
+    }
 
-	public PartOfPlay getPart() {
-		return part;
-	}
-
-	@Override
-	public String toString() {
-		return "PartOfPlayTreeTableRow{" +
-				"part=" + part +
-				'}';
-	}
+    @Override
+    public String toString() {
+        return "PartOfPlayTreeTableRow{" +
+                "part=" + part +
+                '}';
+    }
 }

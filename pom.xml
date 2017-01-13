@@ -61,6 +61,11 @@ limitations under the License.
             <artifactId>miglayout-javafx</artifactId>
             <version>LATEST</version>
         </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.8</version>
+        </dependency>
     </dependencies>
     <build>
         <defaultGoal>clean package</defaultGoal>

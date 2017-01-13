@@ -1,15 +1,17 @@
 package ch.theband.benno.probeplaner.service;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import ch.theband.benno.probeplaner.model.Play;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class OpenService extends ErrorHandlingService<Play> {
 	private final Property<File> file = new SimpleObjectProperty<>();
@@ -19,17 +21,14 @@ public class OpenService extends ErrorHandlingService<Play> {
 		return new Task<Play>() {
 
 			@Override
-			protected Play call() throws Exception {
-				Path path = file.getValue().toPath();
+            protected Play call() throws IOException, ClassNotFoundException {
+                Path path = file.getValue().toPath();
 				System.out.println("Reading file " + path);
-				InputStream inputStream = Files.newInputStream(path);
-				try (ObjectInputStream is = new ObjectInputStream(inputStream)) {
-					Play readPlay = (Play) is.readObject();
-					System.out.println("Read play: " + readPlay);
-					return readPlay;
-				}
-
-			}
+                String xml = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+                XStream xstream = new XStream(new StaxDriver());
+                Play readPlay = (Play) xstream.fromXML(xml);
+                return readPlay;
+            }
 
 		};
 	}

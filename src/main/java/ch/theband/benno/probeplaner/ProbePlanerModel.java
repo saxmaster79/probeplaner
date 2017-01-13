@@ -1,11 +1,5 @@
 package ch.theband.benno.probeplaner;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import ch.theband.benno.probeplaner.model.*;
 import ch.theband.benno.probeplaner.treetable.LineFactory;
 import ch.theband.benno.probeplaner.treetable.PageTreeTableRow;
@@ -15,6 +9,12 @@ import com.google.common.collect.ImmutableList;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProbePlanerModel {
     private final SimpleObjectProperty<Play> play = new SimpleObjectProperty<>();
@@ -44,7 +44,7 @@ public class ProbePlanerModel {
         return savedFile;
     }
 
-    public boolean createScene(TreeItem<TreeTableRow> item, TreeItem<TreeTableRow> root) {
+    public boolean createScene(TreeItem<TreeTableRow> item) {
         if (!onlyPages(Collections.singletonList(item))) {
             return false;
         }
@@ -65,12 +65,17 @@ public class ProbePlanerModel {
         PartOfPlayTreeTableRow newSceneRow = new PartOfPlayTreeTableRow(newScene);
         TreeItem<TreeTableRow> newSceneItem = new TreeItem<TreeTableRow>(newSceneRow);
         addEventHandlers(newSceneRow, newSceneItem);
-        List<Page> sublist = oldScene.getPages().subList(startIndex, oldScene.getPages().size());
+        //Erste Seite wird kopiert
+        Page pageCopy = oldScene.getPages().get(startIndex).copy();
+        newScene.getPages().add(pageCopy);
+
+        List<Page> sublist = oldScene.getPages().subList(startIndex + 1, oldScene.getPages().size());
         newScene.getPages().addAll(sublist);
         oldScene.getPages().removeAll(sublist);
 
-        List<TreeItem<TreeTableRow>> itemSublist = ImmutableList.copyOf(sceneItem.getChildren().subList(startIndex, sceneItem.getChildren().size()));
+        List<TreeItem<TreeTableRow>> itemSublist = ImmutableList.copyOf(sceneItem.getChildren().subList(startIndex + 1, sceneItem.getChildren().size()));
         sceneItem.getChildren().removeAll(itemSublist);
+        newSceneItem.getChildren().add(LineFactory.toTreeItem(pageCopy));
         newSceneItem.getChildren().addAll(itemSublist);
 
         LineFactory.sumUpChildren(newSceneItem);
@@ -102,6 +107,7 @@ public class ProbePlanerModel {
     public List<PartOfPlay> getScenes(List<TreeItem<TreeTableRow>> selectedItems) {
         List<TreeTableRow> rows = selectedItems.stream().map(item -> item.getValue()).collect(Collectors.toList());
         List<PartOfPlay> parts = new ArrayList<>();
+        rows.stream().forEach(e -> e.toString());
         for (TreeTableRow row : rows) {
             if (row instanceof PageTreeTableRow) {
                 System.err.println("Not yet implemented:::: PageTreeTableRow");
@@ -110,5 +116,13 @@ public class ProbePlanerModel {
             }
         }
         return parts;
+    }
+
+    public void sumUpParents(TreeItem<TreeTableRow> value) {
+        TreeItem<TreeTableRow> item = value;
+        while (item.getParent() != null) {
+            item = item.getParent();
+            LineFactory.sumUpChildren(item);
+        }
     }
 }

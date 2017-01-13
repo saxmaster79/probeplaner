@@ -1,9 +1,9 @@
 package ch.theband.benno.probeplaner.model;
 
+import com.google.common.collect.Maps;
+
 import java.io.Serializable;
 import java.util.Map;
-
-import com.google.common.collect.Maps;
 
 public class Page implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -18,9 +18,16 @@ public class Page implements Serializable {
 		return number;
 	}
 
+
 	public Map<Role, Integer> getLines() {
 		return lines;
-	}
+    }
+
+    public Page copy() {
+        Page copy = new Page(this.number);
+        copy.getLines().putAll(this.getLines());
+        return copy;
+    }
 
 	@Override
 	public String toString() {

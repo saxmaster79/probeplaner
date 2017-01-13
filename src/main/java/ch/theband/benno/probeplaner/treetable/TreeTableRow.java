@@ -1,26 +1,38 @@
 package ch.theband.benno.probeplaner.treetable;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+
 import java.util.Collections;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-
 public abstract class TreeTableRow {
-
-	private Map<String, Integer> lines;
-	private boolean showValues = true;
+    private final SimpleStringProperty name = new SimpleStringProperty();
+    protected final ObservableMap<String, Integer> lines;
+    private boolean showValues = true;
 
 	public TreeTableRow() {
 		super();
-		this.lines = Maps.newHashMap();
-	}
+        this.lines = FXCollections.observableHashMap();
+        this.lines.addListener((InvalidationListener) evt -> updateName());
+    }
 
-	public abstract String getName();
+    protected abstract void updateName();
 
-	public void
 
-	setName(String name) {
-	}
+    public final String getName() {
+        return name.get();
+    }
+
+    public final SimpleStringProperty nameProperty() {
+        return name;
+    }
+
+    final void setName(String name) {
+        this.name.set(name);
+    }
 
 	public Map<String, Integer> getLines() {
 		return showValues ? lines : Collections.emptyMap();
@@ -38,6 +50,7 @@ public abstract class TreeTableRow {
 	}
 
 	public void setLines(Map<String,Integer> lines) {
-		this.lines = lines;
-	}
+        this.lines.clear();
+        this.lines.putAll(lines);
+    }
 }

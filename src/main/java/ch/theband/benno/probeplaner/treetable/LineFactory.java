@@ -1,21 +1,16 @@
 package ch.theband.benno.probeplaner.treetable;
 
+import ch.theband.benno.probeplaner.model.*;
+import com.google.common.collect.Collections2;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.scene.control.TreeItem;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.google.common.collect.Collections2;
-
-import ch.theband.benno.probeplaner.model.Act;
-import ch.theband.benno.probeplaner.model.Page;
-import ch.theband.benno.probeplaner.model.Play;
-import ch.theband.benno.probeplaner.model.Role;
-import ch.theband.benno.probeplaner.model.Scene;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
-import javafx.scene.control.TreeItem;
 
 public class LineFactory extends Service<TreeItem<TreeTableRow>> {
 
@@ -53,7 +48,7 @@ public class LineFactory extends Service<TreeItem<TreeTableRow>> {
 	private TreeItem<TreeTableRow> toTreeItem(Scene scene) {
 		TreeTableRow value = new PartOfPlayTreeTableRow(scene);
 		TreeItem<TreeTableRow> treeItem = new TreeItem<>(value);
-		scene.getPages().stream().map(s -> toTreeItem(s)).forEach(treeItem.getChildren()::add);
+		scene.getPages().stream().map(p -> toTreeItem(p)).forEach(treeItem.getChildren()::add);
 
 		addNonLeafStuff(value, treeItem);
 		return treeItem;
@@ -65,11 +60,10 @@ public class LineFactory extends Service<TreeItem<TreeTableRow>> {
 	}
 
 	public static void sumUpChildren(TreeItem<TreeTableRow> treeItem) {
-		Stream<Entry<String, Integer>> flatMap = treeItem.getChildren().stream().flatMap(item -> item.getValue().getLines().entrySet().stream());
-		Map<String, Integer> map = flatMap.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (t, u) -> t + u));
+		Stream<Entry<String, Integer>> entries = treeItem.getChildren().stream().flatMap(item -> item.getValue().getLines().entrySet().stream());
+		Map<String, Integer> map = entries.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (t, u) -> t + u));
 
 		TreeTableRow treeTableRow = treeItem.getValue();
-
 		treeTableRow.setLines(map);
 	}
 
@@ -87,9 +81,10 @@ public class LineFactory extends Service<TreeItem<TreeTableRow>> {
 		value.setShowValues(true);
 	}
 
-	private TreeItem<TreeTableRow> toTreeItem(Page page) {
+	public static TreeItem<TreeTableRow> toTreeItem(Page page) {
 		TreeTableRow row = new PageTreeTableRow(page);
 		final TreeItem<TreeTableRow> item = new TreeItem<TreeTableRow>(row);
+
 		Map<Role, Integer> original = page.getLines();
 
 		row.getLines().putAll(original.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getName(), Map.Entry::getValue)));
@@ -109,8 +104,8 @@ public class LineFactory extends Service<TreeItem<TreeTableRow>> {
 
 	public final class PlayTreeTableRow extends TreeTableRow {
 		@Override
-		public String getName() {
-			return play.getName();
+		protected void updateName() {
+			setName(play.getName());
 		}
 	}
 }

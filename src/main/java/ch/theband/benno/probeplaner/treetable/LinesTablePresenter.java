@@ -1,16 +1,11 @@
 package ch.theband.benno.probeplaner.treetable;
 
-import java.util.List;
-import java.util.Objects;
-
-import javax.inject.Inject;
-
 import ch.theband.benno.probeplaner.ProbePlanerModel;
-import ch.theband.benno.probeplaner.detail.DetailPresenter;
 import ch.theband.benno.probeplaner.model.PartOfPlay;
 import ch.theband.benno.probeplaner.model.Play;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -23,12 +18,16 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Objects;
+
 public class LinesTablePresenter {
 
     @FXML
     private TreeTableView<TreeTableRow> treeTable;
     @FXML
-    private TreeTableColumn<TreeTableRow, String> name;
+    private TreeTableColumn<TreeTableRow, String> treeColumn;
     @FXML
     private MenuItem createScene;
     @FXML
@@ -45,10 +44,11 @@ public class LinesTablePresenter {
     }
 
     private void createTreeTable(Play play) {
+        resetColumns();
         treeTable.setRoot(null);
         if (play != null) {
-            name.setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
-            name.setCellFactory(col -> new TextFieldTreeTableCell<>());
+            treeColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
+            treeColumn.setCellFactory(col -> new TextFieldTreeTableCell<>());
             LineFactory service = new LineFactory(play);
             service.setOnSucceeded(t -> {
                 TreeItem<TreeTableRow> root = service.getValue();
@@ -62,6 +62,13 @@ public class LinesTablePresenter {
             service.start();
 
             service.getHeaders().stream().map(this::createTreeTableColumn).forEachOrdered(treeTable.getColumns()::add);
+        }
+    }
+
+    private void resetColumns() {
+        ObservableList<TreeTableColumn<TreeTableRow, ?>> cols = treeTable.getColumns();
+        if (cols.size() > 1) {
+            cols.remove(1, cols.size());
         }
     }
 
@@ -88,7 +95,11 @@ public class LinesTablePresenter {
 
             if (row != null && row.getLines().get(title) != null) {
                 simpleIntegerProperty = new SimpleIntegerProperty(row.getLines().get(title));
-                simpleIntegerProperty.addListener((observable, oldValue, newValue) -> row.getLines().put(title, (Integer) newValue));
+                simpleIntegerProperty.addListener((observable, oldValue, newValue) -> {
+                    row.getLines().put(title, (Integer) newValue);
+                    model.sumUpParents(cellDataFeatures.getValue());
+
+                });
             } else {
                 simpleIntegerProperty = new SimpleIntegerProperty();
             }
@@ -165,7 +176,7 @@ public class LinesTablePresenter {
     public void createScene() {
         TreeItem<TreeTableRow> selectedItem = treeTable.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
-            model.createScene(selectedItem, treeTable.getRoot());
+            model.createScene(selectedItem);
         }
     }
 
