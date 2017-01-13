@@ -10,12 +10,12 @@
     <contextMenu>
         <ContextMenu onShowing="#adjustContextMenu">
             <items>
-                <MenuItem onAction="#createRehearsal" text="%createRehearsal"/>
-                <SeparatorMenuItem/>
                 <MenuItem onAction="#createScene" text="%createScene"
                           fx:id="createScene"/>
                 <!--MenuItem onAction="#mergeWithNextScene" text="%mergeWithNextScene" fx:id="mergeNext"
                           /-->
+                <SeparatorMenuItem/>
+                <MenuItem onAction="#createRehearsal" text="%createRehearsal"/>
                 <SeparatorMenuItem/>
                 <MenuItem onAction="#delete" text="%delete" fx:id="delete"/>
             </items>
