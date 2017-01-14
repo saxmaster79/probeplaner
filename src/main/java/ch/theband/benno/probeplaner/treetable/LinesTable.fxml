@@ -12,6 +12,8 @@
             <items>
                 <MenuItem onAction="#createScene" text="%createScene"
                           fx:id="createScene"/>
+                <MenuItem onAction="#createAct" text="%createAct"
+                          fx:id="createAct"/>
                 <!--MenuItem onAction="#mergeWithNextScene" text="%mergeWithNextScene" fx:id="mergeNext"
                           /-->
                 <SeparatorMenuItem/>

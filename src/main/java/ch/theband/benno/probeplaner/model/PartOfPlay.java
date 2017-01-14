@@ -27,4 +27,5 @@ public abstract class PartOfPlay implements Serializable {
 	}
 
 	public abstract int getNumberOfLines();
+
 }

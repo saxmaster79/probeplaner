@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 
 public class SaveService extends ErrorHandlingService<Void> {
 	private final Property<Play> play = new SimpleObjectProperty<>();
@@ -29,7 +28,7 @@ public class SaveService extends ErrorHandlingService<Void> {
 
                 XStream xstream = new XStream(new StaxDriver());
                 String xml = xstream.toXML(play.getValue());
-                Files.write(path, xml.getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
+                Files.write(path, xml.getBytes(StandardCharsets.UTF_8));
                 System.out.println("Saved file");
 				return null;
 			}

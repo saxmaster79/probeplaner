@@ -8,12 +8,14 @@ import ch.theband.benno.probeplaner.treetable.TreeTableRow;
 import com.google.common.collect.ImmutableList;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ProbePlanerModel {
@@ -42,6 +44,53 @@ public class ProbePlanerModel {
 
     public ObjectProperty<File> savedFileProperty() {
         return savedFile;
+    }
+
+
+    public boolean createAct(TreeItem<TreeTableRow> item) {
+        if (!(item.getValue() instanceof PartOfPlayTreeTableRow)) {
+            return false;
+        }
+        PartOfPlay part = ((PartOfPlayTreeTableRow) item.getValue()).getPart();
+        if (!(part instanceof Scene)) {
+            return false;
+        }
+        Scene scene = (Scene) part;
+        TreeItem<TreeTableRow> actItem = item.getParent();
+        final int startIndex = actItem.getChildren().indexOf(item);
+        if (startIndex < 0) throw new IllegalStateException("startIndex not found!!!");
+        if (startIndex == 0) {
+            return false;
+        }
+        PartOfPlayTreeTableRow oldActRow = (PartOfPlayTreeTableRow) actItem.getValue();
+        Act oldAct = (Act) oldActRow.getPart();
+
+        TreeItem<TreeTableRow> playItem = actItem.getParent();
+
+        Act newAct = oldAct.copy();
+        PartOfPlayTreeTableRow newActRow = new PartOfPlayTreeTableRow(newAct);
+        TreeItem<TreeTableRow> newActItem = new TreeItem<TreeTableRow>(newActRow);
+        addEventHandlers(newActRow, newActItem);
+
+        List<Scene> sublist = oldAct.getScenes().subList(startIndex, oldAct.getScenes().size());
+        newAct.getScenes().addAll(sublist);
+        oldAct.getScenes().removeAll(sublist);
+
+        List<TreeItem<TreeTableRow>> itemSublist = ImmutableList.copyOf(actItem.getChildren().subList(startIndex, actItem.getChildren().size()));
+        actItem.getChildren().removeAll(itemSublist);
+        newActItem.getChildren().addAll(itemSublist);
+
+        LineFactory.sumUpChildren(newActItem);
+
+        List<TreeItem<TreeTableRow>> actNodes = playItem.getChildren();
+        actNodes.add(actNodes.indexOf(actItem) + 1, newActItem);
+        List<Act> acts = play.getValue().getActs();
+        acts.add(acts.indexOf(oldAct) + 1, newAct);
+
+
+        LineFactory.sumUpChildren(playItem);
+        play.getValue().correctAllSceneNumbers();
+        return true;
     }
 
     public boolean createScene(TreeItem<TreeTableRow> item) {
@@ -92,6 +141,34 @@ public class ProbePlanerModel {
         return true;
     }
 
+    public void delete(ObservableList<TreeItem<TreeTableRow>> selectedItems) {
+        treeItem:
+        for (TreeItem<TreeTableRow> item : ImmutableList.copyOf(selectedItems)) {
+            TreeTableRow row = item.getValue();
+            if (row instanceof PartOfPlayTreeTableRow) {
+                PartOfPlay part = ((PartOfPlayTreeTableRow) row).getPart();
+                if (play.getValue().getActs().remove(part)) {
+                    item.getParent().getChildren().remove(item);
+                } else {
+                    for (Act act : play.getValue().getActs()) {
+                        if (act.getScenes().remove(part)) {
+                            item.getParent().getChildren().remove(item);
+                        } else throw new IllegalArgumentException("Unknown part " + part);
+                    }
+                }
+            } else if (row instanceof PageTreeTableRow) {
+                for (Act act : play.getValue().getActs()) {
+                    for (Scene scene : act.getScenes()) {
+                        if (scene.getPages().remove(((PageTreeTableRow) row).getPage())) {
+                            item.getParent().getChildren().remove(item);
+                            continue treeItem;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
     private void addEventHandlers(PartOfPlayTreeTableRow row, TreeItem<TreeTableRow> item) {
         LineFactory.addEventHandlers(row, item);
@@ -100,8 +177,14 @@ public class ProbePlanerModel {
     }
 
     public boolean onlyPages(List<TreeItem<TreeTableRow>> items) {
-        boolean otherItemsPresent = items.stream().map(TreeItem::getValue).filter(row -> (!(row instanceof PageTreeTableRow))).findAny().isPresent();
-        return !otherItemsPresent;
+        Predicate<TreeTableRow> isPageTreeTableRow = row -> (row instanceof PageTreeTableRow);
+        return items.stream().map(TreeItem::getValue).allMatch(isPageTreeTableRow);
+    }
+
+    public boolean onlyScenes(List<TreeItem<TreeTableRow>> items) {
+        Predicate<TreeTableRow> isPartOfPlayTreeTableRow = row -> (row instanceof PartOfPlayTreeTableRow);
+        Predicate<TreeTableRow> isPartAScene = row -> ((PartOfPlayTreeTableRow) row).getPart() instanceof Scene;
+        return items.stream().map(TreeItem::getValue).allMatch(isPartOfPlayTreeTableRow.and(isPartAScene));
     }
 
     public List<PartOfPlay> getScenes(List<TreeItem<TreeTableRow>> selectedItems) {
@@ -125,4 +208,6 @@ public class ProbePlanerModel {
             LineFactory.sumUpChildren(item);
         }
     }
+
+
 }

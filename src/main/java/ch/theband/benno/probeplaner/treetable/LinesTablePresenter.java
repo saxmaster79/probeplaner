@@ -31,6 +31,8 @@ public class LinesTablePresenter {
     @FXML
     private MenuItem createScene;
     @FXML
+    private MenuItem createAct;
+    @FXML
     private MenuItem delete;
 
     @Inject
@@ -117,6 +119,7 @@ public class LinesTablePresenter {
     public void adjustContextMenu(Event event) {
         List<TreeItem<TreeTableRow>> selectedItems = getSelectedItems();
         createScene.setVisible(!selectedItems.isEmpty() && model.onlyPages(selectedItems));
+        createAct.setVisible(!selectedItems.isEmpty() && model.onlyScenes(selectedItems));
         delete.setVisible(!selectedItems.isEmpty());
     }
 
@@ -181,14 +184,18 @@ public class LinesTablePresenter {
     }
 
     @FXML
-    public void delete() {
-        TreeTableViewSelectionModel<TreeTableRow> sel = treeTable.getSelectionModel();
-        for (TreeItem<TreeTableRow> item : sel.getSelectedItems()) {
-            if (item != null) {
-                item.getParent().getChildren().remove(item);
-            }
+    public void createAct() {
+        TreeItem<TreeTableRow> selectedItem = treeTable.getSelectionModel().getSelectedItem();
+        if (selectedItem != null) {
+            model.createAct(selectedItem);
         }
-        sel.clearSelection();
+    }
+
+    @FXML
+    public void delete() {
+        ObservableList<TreeItem<TreeTableRow>> selectedItems = treeTable.getSelectionModel().getSelectedItems();
+        model.delete(selectedItems);
+        treeTable.getSelectionModel().clearSelection();
     }
 
 }

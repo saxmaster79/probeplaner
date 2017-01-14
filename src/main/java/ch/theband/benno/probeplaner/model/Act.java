@@ -1,8 +1,8 @@
 package ch.theband.benno.probeplaner.model;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
+
+import java.util.List;
 
 public class Act extends PartOfPlay {
 
@@ -20,5 +20,9 @@ public class Act extends PartOfPlay {
 
 	public List<Scene> getScenes() {
 		return scenes;
+	}
+
+	public Act copy() {
+		return new Act(number++, getName());
 	}
 }

@@ -1,31 +1,26 @@
 package ch.theband.benno.probeplaner.service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import com.google.common.base.MoreObjects;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
-
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder.ListMultimapBuilder;
-
 import ch.theband.benno.probeplaner.model.Act;
 import ch.theband.benno.probeplaner.model.Play;
 import ch.theband.benno.probeplaner.model.Role;
 import ch.theband.benno.probeplaner.model.Scene;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.*;
+import com.google.common.collect.MultimapBuilder.ListMultimapBuilder;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.util.PDFTextStripper;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class PdfFileExtractor extends Service<Play> {
     private ImmutableSet<Role> roles;
@@ -63,7 +58,7 @@ public class PdfFileExtractor extends Service<Play> {
             scene.getPages().add(page);
         }
 
-        return Collections.singletonList(act);
+        return Lists.newArrayList(act);
     }
 
     private Page getPage(int i, int j, Multimap<Integer, Page> pages) {
