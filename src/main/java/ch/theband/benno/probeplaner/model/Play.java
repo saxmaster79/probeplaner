@@ -2,11 +2,12 @@ package ch.theband.benno.probeplaner.model;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 public class Play implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -44,7 +45,17 @@ public class Play implements Serializable {
         }
     }
 
+	public void correctAllActNumbers() {
+		for (int i = 0; i < acts.size(); i++) {
+			acts.get(i).setNumber(i + 1);
+			acts.get(i).setName((i + 1) + ". Akt");
+		}
+		correctAllSceneNumbers();
+	}
+
     public Comparator<Role> rolesComparator(){
     	return Ordering.explicit(ImmutableList.copyOf(roles));
 	}
+
+
 }

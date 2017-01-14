@@ -8,8 +8,8 @@ public abstract class PartOfPlay implements Serializable {
 	protected int number;
 	private String name;
 
-	public PartOfPlay(int number, String name) {
-		super();
+    protected PartOfPlay(int number, String name) {
+        super();
 		this.number = number;
 		this.name = name;
 	}
@@ -17,6 +17,10 @@ public abstract class PartOfPlay implements Serializable {
 	public int getNumber() {
 		return number;
 	}
+
+    public final void setNumber(int number) {
+        this.number = number;
+    }
 
 	public String getName() {
 		return name;

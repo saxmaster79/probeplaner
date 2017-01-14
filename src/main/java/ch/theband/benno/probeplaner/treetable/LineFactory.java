@@ -104,7 +104,7 @@ public class LineFactory extends Service<TreeItem<TreeTableRow>> {
 
 	public final class PlayTreeTableRow extends TreeTableRow {
 		@Override
-		protected void updateName() {
+		public void updateName() {
 			setName(play.getName());
 		}
 	}

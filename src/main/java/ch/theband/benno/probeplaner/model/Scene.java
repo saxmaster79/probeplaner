@@ -1,8 +1,8 @@
 package ch.theband.benno.probeplaner.model;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
+
+import java.util.List;
 
 public class Scene extends PartOfPlay {
 	private static final long serialVersionUID = 1L;
@@ -19,10 +19,6 @@ public class Scene extends PartOfPlay {
 
 	public List<Page> getPages() {
 		return pages;
-	}
-
-	public void setNumber(int number){
-		this.number=number;
 	}
 
 	public Scene copy(){

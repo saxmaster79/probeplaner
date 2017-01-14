@@ -56,6 +56,7 @@ public class FramePresenter {
 
     public FramePresenter() {
         super();
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML", "*.xml"));
     }
 
     public void initialize() {

@@ -22,6 +22,7 @@ public class Act extends PartOfPlay {
 		return scenes;
 	}
 
+
 	public Act copy() {
 		return new Act(number++, getName());
 	}

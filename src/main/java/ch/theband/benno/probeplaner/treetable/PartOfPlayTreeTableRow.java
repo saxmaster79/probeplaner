@@ -12,7 +12,7 @@ public class PartOfPlayTreeTableRow extends TreeTableRow {
     }
 
     @Override
-    protected void updateName() {
+    public final void updateName() {
         setName(part.getName() + " (" + lines.values().stream().mapToInt(Integer::intValue).sum() +
                 ")");
     }

@@ -19,7 +19,7 @@ public abstract class TreeTableRow {
         this.lines.addListener((InvalidationListener) evt -> updateName());
     }
 
-    protected abstract void updateName();
+    public abstract void updateName();
 
 
     public final String getName() {

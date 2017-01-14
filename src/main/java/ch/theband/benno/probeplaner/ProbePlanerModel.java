@@ -13,6 +13,7 @@ import javafx.scene.control.TreeItem;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -89,7 +90,8 @@ public class ProbePlanerModel {
 
 
         LineFactory.sumUpChildren(playItem);
-        play.getValue().correctAllSceneNumbers();
+        play.getValue().correctAllActNumbers();
+        updateNames(playItem.getChildren());
         return true;
     }
 
@@ -137,8 +139,15 @@ public class ProbePlanerModel {
 
         LineFactory.sumUpChildren(sceneItem);
         play.getValue().correctAllSceneNumbers();
-
+        updateNames(actItem.getChildren());
         return true;
+    }
+
+    private void updateNames(Collection<TreeItem<TreeTableRow>> rowsToUpdate) {
+        rowsToUpdate.forEach(row -> {
+            row.getValue().updateName();
+            updateNames(row.getChildren());
+        });
     }
 
     public void delete(ObservableList<TreeItem<TreeTableRow>> selectedItems) {
