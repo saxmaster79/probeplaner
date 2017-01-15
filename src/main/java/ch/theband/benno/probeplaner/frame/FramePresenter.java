@@ -3,6 +3,7 @@ package ch.theband.benno.probeplaner.frame;
 import ch.theband.benno.probeplaner.ProbePlanerModel;
 import ch.theband.benno.probeplaner.detail.DetailPresenter;
 import ch.theband.benno.probeplaner.detail.DetailView;
+import ch.theband.benno.probeplaner.rehearsals.RehearsalsPresenter;
 import ch.theband.benno.probeplaner.rehearsals.RehearsalsView;
 import ch.theband.benno.probeplaner.service.OpenService;
 import ch.theband.benno.probeplaner.service.PdfFileExtractor;
@@ -65,6 +66,7 @@ public class FramePresenter {
         chooser.setInitialDirectory(new File("."));
 
         getLinesTablePresenter().setCreateRehearsalCallback(getDetailPresenter()::createRehearsal);
+        getDetailPresenter().setSaveRehearsalCallback(getRehearsalsPresenter()::saveRehearsal);
     }
 
     private LinesTablePresenter getLinesTablePresenter() {
@@ -75,6 +77,9 @@ public class FramePresenter {
         return (DetailPresenter)detailView.getPresenter();
     }
 
+    private RehearsalsPresenter getRehearsalsPresenter() {
+        return (RehearsalsPresenter) rehearsalsView.getPresenter();
+    }
     @FXML
     public void doImport() {
         importService.reset();
@@ -166,4 +171,5 @@ public class FramePresenter {
     public void doExit() {
         Platform.exit();
     }
+
 }

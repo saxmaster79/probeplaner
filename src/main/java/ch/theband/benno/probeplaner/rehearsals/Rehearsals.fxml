@@ -1,13 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.SplitPane?>
+<?import ch.theband.benno.probeplaner.rehearsals.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
-
 <SplitPane dividerPositions="0.5" orientation="VERTICAL" xmlns="http://javafx.com/javafx/8.0.76-ea"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="ch.theband.benno.probeplaner.rehearsals.RehearsalsPresenter" fx:id="splitPane">
     <items>
-        <ListView fx:id="rehearsals"/>
+        <TableView fx:id="rehearsals" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn text="%date" fx:id="date">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="startTime"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="%scene" fx:id="what">
+                    <cellValueFactory>
+                        <WhatCellValueFactory/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="%who" fx:id="who">
+                    <cellValueFactory>
+                        <RehearsalsPresenter.WhoCellValueFactory fx:id="whoCellValueFactory"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="%remark">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="remark"/>
+                    </cellValueFactory>
+                </TableColumn>
+            </columns>
+        </TableView>
     </items>
 </SplitPane>
