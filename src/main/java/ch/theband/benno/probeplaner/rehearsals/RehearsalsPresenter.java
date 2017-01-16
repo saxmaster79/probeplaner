@@ -9,10 +9,7 @@ import ch.theband.benno.probeplaner.table.TableUtils;
 import com.google.common.collect.Ordering;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 
 import javax.inject.Inject;
 import java.net.URL;
@@ -65,6 +62,7 @@ public class RehearsalsPresenter implements Initializable {
             }
         });
         who.setCellFactory(new MulitlineCellFactory<>());
+        rehearsals.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         TableUtils.installCopyPasteHandler(rehearsals);
     }
 
