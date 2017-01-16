@@ -14,6 +14,7 @@ public class WhatCellValueFactory implements Callback<TableColumn.CellDataFeatur
     @Override
     public ObservableValue<String> call(TableColumn.CellDataFeatures<Rehearsal, String> param) {
         List<PartOfPlay> what = param.getValue().getWhat();
+        //todo schön machen, 1. Akt 2-4 etc.
         String result = what.stream().map(pop -> pop.getName()).collect(Collectors.joining(", "));
         return new ReadOnlyStringWrapper(result);
     }

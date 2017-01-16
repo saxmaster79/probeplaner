@@ -1,4 +1,4 @@
-package ch.theband.benno.probeplaner.treetable;
+package ch.theband.benno.probeplaner.table;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -6,19 +6,24 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTablePosition;
-import javafx.scene.control.TreeTableView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableView;
 import javafx.scene.input.*;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.StringTokenizer;
 
 public class TableUtils {
 
-    private static NumberFormat numberFormatter = NumberFormat.getNumberInstance();
+    private static final NumberFormat numberFormatter = NumberFormat.getNumberInstance();
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+    public static final KeyCodeCombination COPY = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
+    public static final KeyCodeCombination PASTE = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY);
 
 
     /**
@@ -28,7 +33,7 @@ public class TableUtils {
      *
      * @param table
      */
-    public static void installCopyPasteHandler(TreeTableView<?> table) {
+    public static void installCopyPasteHandler(TableView<?> table) {
 
         // install copy/paste keyboard handler
         table.setOnKeyPressed(new TableKeyEventHandler());
@@ -37,33 +42,30 @@ public class TableUtils {
 
     /**
      * Copy/Paste keyboard event handler.
-     * The handler uses the keyEvent's source for the clipboard data. The source must be of type TreeTableView.
+     * The handler uses the keyEvent's source for the clipboard data. The source must be of type TableView.
      */
     public static class TableKeyEventHandler implements EventHandler<KeyEvent> {
 
-        KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
-        KeyCodeCombination pasteKeyCodeCompination = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY);
-
         public void handle(final KeyEvent keyEvent) {
 
-            if (copyKeyCodeCompination.match(keyEvent)) {
+            if (COPY.match(keyEvent)) {
 
-                if (keyEvent.getSource() instanceof TreeTableView) {
+                if (keyEvent.getSource() instanceof TableView) {
 
                     // copy to clipboard
-                    copySelectionToClipboard((TreeTableView<?>) keyEvent.getSource());
+                    copySelectionToClipboard((TableView<?>) keyEvent.getSource());
 
                     // event is handled, consume it
                     keyEvent.consume();
 
                 }
 
-            } else if (pasteKeyCodeCompination.match(keyEvent)) {
+            } else if (PASTE.match(keyEvent)) {
 
-                if (keyEvent.getSource() instanceof TreeTableView) {
+                if (keyEvent.getSource() instanceof TableView) {
 
                     // copy to clipboard
-                    pasteFromClipboard((TreeTableView<?>) keyEvent.getSource());
+                    pasteFromClipboard((TableView<?>) keyEvent.getSource());
 
                     // event is handled, consume it
                     keyEvent.consume();
@@ -81,48 +83,52 @@ public class TableUtils {
      *
      * @param table
      */
-    public static <S> void copySelectionToClipboard(TreeTableView<S> table) {
+    public static void copySelectionToClipboard(TableView<?> table) {
 
         StringBuilder clipboardString = new StringBuilder();
 
-        ObservableList<TreeTablePosition<S, ?>> positionList = table.getSelectionModel().getSelectedCells();
+        ObservableList<TablePosition> positionList = table.getSelectionModel().getSelectedCells();
+
 
         int prevRow = -1;
 
-        for (TreeTablePosition<S, ?> position : positionList) {
+        for (TablePosition position : positionList) {
 
-            int row = position.getRow();
+            final int row = position.getRow();
 
-            for (TreeTableColumn<S, ?> col : table.getColumns()) {
+            final int startCol;
+            final int endCol;
+            if (!table.getSelectionModel().isCellSelectionEnabled()) {
+                startCol = 0;
+                endCol = table.getColumns().size();
+            } else {
+                startCol = position.getColumn();
+                endCol = position.getColumn() + 1;
+            }
+            for (int col = startCol; col < endCol; col++) {
 
+
+                // determine whether we advance in a row (tab) or a column
+                // (newline).
+                if (prevRow == row) {
+
+                    clipboardString.append('\t');
+
+                } else if (prevRow != -1) {
+
+                    clipboardString.append('\n');
+
+                }
 
                 // create string from cell
-                String text = "";
-
-                Object observableValue = col.getCellObservableValue(row);
-
-                // null-check: provide empty string for nulls
-                if (observableValue instanceof DoubleProperty) { // TODO: handle boolean etc
-                    text = numberFormatter.format(((DoubleProperty) observableValue).get());
-                } else if (observableValue instanceof IntegerProperty) {
-                    int number = ((IntegerProperty) observableValue).get();
-                    if (number == 0) {
-                        text = "";
-                    } else {
-                        text = numberFormatter.format(number);
-                    }
-                } else if (observableValue instanceof StringProperty) {
-                    text = ((StringProperty) observableValue).get();
-                } else {
-                    text = Objects.toString(observableValue, "");
-                }
+                String text = createStringFromCell(table, row, col);
 
                 // add new item to clipboard
                 clipboardString.append(text);
-                clipboardString.append('\t');
 
+                // remember previous
+                prevRow = row;
             }
-            clipboardString.append('\n');
         }
 
         // create clipboard content
@@ -135,7 +141,35 @@ public class TableUtils {
 
     }
 
-    public static void pasteFromClipboard(TreeTableView<?> table) {
+    private static String createStringFromCell(TableView<?> table, int row, int col) {
+        final String text;
+        ObservableValue<?> observableValue = table.getColumns().get(col).getCellObservableValue(row);
+        return getString(observableValue);
+    }
+
+    public static String getString(ObservableValue<?> observableValue) {
+        String text;
+        if (observableValue == null) {
+            text = "";
+        } else if (observableValue instanceof DoubleProperty) { // TODO: handle boolean etc
+            text = numberFormatter.format(((DoubleProperty) observableValue).get());
+        } else if (observableValue instanceof IntegerProperty) {
+            text = numberFormatter.format(((IntegerProperty) observableValue).get());
+        } else if (observableValue instanceof StringProperty) {
+            text = ((StringProperty) observableValue).get();
+        } else {
+            Object value = observableValue.getValue();
+            if (value instanceof LocalDateTime) {
+                text = dateTimeFormatter.format((LocalDateTime) value);
+            } else {
+                System.out.println("Unsupported observable value: " + observableValue);
+                text = value.toString();
+            }
+        }
+        return text;
+    }
+
+    public static void pasteFromClipboard(TableView<?> table) {
 
         // abort if there's not cell selected to start with
         if (table.getSelectionModel().getSelectedCells().size() == 0) {
@@ -143,7 +177,7 @@ public class TableUtils {
         }
 
         // get the cell position to start with
-        TreeTablePosition pasteCellPosition = table.getSelectionModel().getSelectedCells().get(0);
+        TablePosition pasteCellPosition = table.getSelectionModel().getSelectedCells().get(0);
 
         System.out.println("Pasting into cell " + pasteCellPosition);
 
@@ -176,7 +210,7 @@ public class TableUtils {
                 int colTable = pasteCellPosition.getColumn() + colClipboard;
 
                 // skip if we reached the end of the table
-                if (rowTable >= table.getExpandedItemCount()) {
+                if (rowTable >= table.getItems().size()) {
                     continue;
                 }
                 if (colTable >= table.getColumns().size()) {
@@ -186,7 +220,7 @@ public class TableUtils {
                 // System.out.println( rowClipboard + "/" + colClipboard + ": " + cell);
 
                 // get cell
-                TreeTableColumn tableColumn = table.getColumns().get(colTable);
+                TableColumn tableColumn = table.getColumns().get(colTable);
                 ObservableValue observableValue = tableColumn.getCellObservableValue(rowTable);
 
                 System.out.println(rowTable + "/" + colTable + ": " + observableValue);

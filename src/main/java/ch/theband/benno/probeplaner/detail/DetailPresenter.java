@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 public class DetailPresenter {
 
     @Inject
-    ProbePlanerModel model;
+    private ProbePlanerModel model;
     @FXML
     private TextArea who;
     @FXML
@@ -30,7 +30,7 @@ public class DetailPresenter {
     @FXML
     private DatePicker date;
     @FXML
-    ComboBox<LocalTime> time;
+    private ComboBox<LocalTime> time;
     private Callback<Rehearsal, Void> saveRehearsalCallback;
     private List<PartOfPlay> scenes;
 

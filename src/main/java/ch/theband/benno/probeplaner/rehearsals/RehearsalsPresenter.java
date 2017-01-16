@@ -2,10 +2,11 @@ package ch.theband.benno.probeplaner.rehearsals;
 
 import ch.theband.benno.probeplaner.ProbePlanerModel;
 import ch.theband.benno.probeplaner.detail.DetailView;
-import ch.theband.benno.probeplaner.model.*;
+import ch.theband.benno.probeplaner.model.Play;
+import ch.theband.benno.probeplaner.model.Rehearsal;
+import ch.theband.benno.probeplaner.model.Role;
+import ch.theband.benno.probeplaner.table.TableUtils;
 import com.google.common.collect.Ordering;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.SplitPane;
@@ -17,12 +18,8 @@ import javax.inject.Inject;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class RehearsalsPresenter implements Initializable {
     private DateTimeFormatter formatter;
@@ -34,11 +31,13 @@ public class RehearsalsPresenter implements Initializable {
     private WhoCellValueFactory whoCellValueFactory;
     @FXML
     private TableColumn<Rehearsal, LocalDateTime> date;
+    @FXML
+    private TableColumn<Rehearsal, String> who;
     @Inject
-    DetailView detailsView;
+    private DetailView detailsView;
 
     @Inject
-    ProbePlanerModel model;
+    private ProbePlanerModel model;
 
     public RehearsalsPresenter() {
         super();
@@ -62,9 +61,11 @@ public class RehearsalsPresenter implements Initializable {
                 if (empty)
                     setText(null);
                 else
-                    setText(String.format(item.format(formatter)));
+                    setText(item.format(formatter));
             }
         });
+        who.setCellFactory(new MulitlineCellFactory<>());
+        TableUtils.installCopyPasteHandler(rehearsals);
     }
 
     private void updateComparator(Play newValue) {
@@ -74,47 +75,8 @@ public class RehearsalsPresenter implements Initializable {
 
     public Void saveRehearsal(Rehearsal rehearsal) {
         rehearsals.getItems().add(rehearsal);
+
         return null;
-    }
-
-
-    public static class WhoCellValueFactory implements javafx.util.Callback<TableColumn.CellDataFeatures<Rehearsal, String>, javafx.beans.value.ObservableValue<String>> {
-
-        private Comparator<? super Role> comparator = Ordering.usingToString();
-
-        @Override
-        public ObservableValue<String> call(TableColumn.CellDataFeatures<Rehearsal, String> param) {
-            List<PartOfPlay> what = param.getValue().getWhat();
-            final String value = what.stream().flatMap(this::getRoles).distinct().sorted(comparator).map(r -> r.getName()).collect(Collectors.joining(", "));
-
-            return new ReadOnlyStringWrapper(value);
-        }
-
-        private Stream<Role> getRoles(PartOfPlay partOfPlay) {
-            if (partOfPlay instanceof Scene) {
-                return getRoles((Scene) partOfPlay);
-            }
-            if (partOfPlay instanceof Act) {
-                return getRoles((Act) partOfPlay);
-            }
-            return Stream.empty();
-        }
-
-        private Stream<Role> getRoles(Scene scene) {
-            return scene.getPages().stream().flatMap(p -> getRoles(p).stream());
-        }
-
-        private Stream<Role> getRoles(Act act) {
-            return act.getScenes().stream().flatMap(this::getRoles);
-        }
-
-        private Collection<Role> getRoles(Page page) {
-            return page.getLines().keySet();
-        }
-
-        public void setComparator(Comparator<? super Role> comparator) {
-            this.comparator = comparator;
-        }
     }
 
 

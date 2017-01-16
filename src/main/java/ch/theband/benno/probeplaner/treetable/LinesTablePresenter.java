@@ -42,7 +42,7 @@ public class LinesTablePresenter {
     public void initialize() {
         model.playProperty().addListener((observable, oldValue, newValue) -> createTreeTable(newValue));
         treeTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        TableUtils.installCopyPasteHandler(treeTable);
+        TreeTableUtils.installCopyPasteHandler(treeTable);
     }
 
     private void createTreeTable(Play play) {
