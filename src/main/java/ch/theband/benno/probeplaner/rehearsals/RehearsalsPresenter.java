@@ -71,7 +71,8 @@ public class RehearsalsPresenter implements Initializable {
         whoCellValueFactory.setComparator(comparator);
     }
 
-    public Void saveRehearsal(Rehearsal rehearsal) {
+    public Void addRehearsal(Rehearsal rehearsal) {
+        model.getPlay();
         rehearsals.getItems().add(rehearsal);
 
         return null;

@@ -21,12 +21,14 @@ public class App extends Application {
     public void start(Stage stage) {
         FrameView frameView = new FrameView();
         Scene scene = new Scene(frameView.getView());
-        stage.setTitle("Probeplaner");
+        stage.setTitle("Probeplaner - neu");
         stage.setWidth(1400);
         final String uri = getClass().getResource("app.css").toExternalForm();
         scene.getStylesheets().add(uri);
         stage.setScene(scene);
         stage.show();
+        ProbePlanerModel model = (ProbePlanerModel) Injector.instantiateModelOrService(ProbePlanerModel.class);
+        model.savedFileProperty().addListener((p, o, n) -> stage.setTitle("Probeplaner - " + n.getName()));
     }
 
     @Override

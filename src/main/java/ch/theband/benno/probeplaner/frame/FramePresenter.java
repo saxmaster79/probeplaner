@@ -66,7 +66,7 @@ public class FramePresenter {
         chooser.setInitialDirectory(new File("."));
 
         getLinesTablePresenter().setCreateRehearsalCallback(getDetailPresenter()::createRehearsal);
-        getDetailPresenter().setSaveRehearsalCallback(getRehearsalsPresenter()::saveRehearsal);
+        getDetailPresenter().setSaveRehearsalCallback(getRehearsalsPresenter()::addRehearsal);
     }
 
     private LinesTablePresenter getLinesTablePresenter() {

@@ -1,8 +1,9 @@
 *Todo*
-- Zellen editieren und dann speichern, wieder öffnen -> Zellen sind nicht editiert.
-
+- Proben speichern
+- Probe bearbeiten
+- Probe löschen
+- Abwesenheiten von Spielern
 - Summen stimmen nicht mehr, wenn
-- Probe hinzufügen
 
 - Liste der Proben exportieren
 - Tree exportieren/drucken
