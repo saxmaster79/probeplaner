@@ -50,6 +50,7 @@ public class RehearsalsPresenter implements Initializable {
 
     public void initialize() {
         splitPane.getItems().add(0, detailsView.getView());
+        //splitPane.setDividerPosition(0, 0.4);
         model.playProperty().addListener((observable, oldValue, newValue) -> updateComparator(newValue));
         model.probePlanerDataProperty().addListener((observable, oldValue, newValue) -> {
             rehearsals.getItems().clear();
