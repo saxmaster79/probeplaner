@@ -7,6 +7,8 @@ import ch.theband.benno.probeplaner.model.Rehearsal;
 import ch.theband.benno.probeplaner.model.Role;
 import ch.theband.benno.probeplaner.table.TableUtils;
 import com.google.common.collect.Ordering;
+import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -49,6 +51,10 @@ public class RehearsalsPresenter implements Initializable {
     public void initialize() {
         splitPane.getItems().add(0, detailsView.getView());
         model.playProperty().addListener((observable, oldValue, newValue) -> updateComparator(newValue));
+        model.probePlanerDataProperty().addListener((observable, oldValue, newValue) -> {
+            rehearsals.getItems().clear();
+            rehearsals.getItems().addAll(newValue.getReherarsals());
+        });
 
         date.setCellFactory(col -> new TableCell<Rehearsal, LocalDateTime>() {
             @Override
@@ -62,8 +68,16 @@ public class RehearsalsPresenter implements Initializable {
             }
         });
         who.setCellFactory(new MulitlineCellFactory<>());
-        rehearsals.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        rehearsals.getItems().addListener(new ListChangeListener<Rehearsal>() {
+            @Override
+            public void onChanged(Change<? extends Rehearsal> c) {
+                Platform.runLater(() ->
+                        who.setPrefWidth(who.getPrefWidth() + 1));
+            }
+        });
         TableUtils.installCopyPasteHandler(rehearsals);
+        rehearsals.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        rehearsals.getSelectionModel().selectedItemProperty().addListener((o, old, newValue) -> model.setCurrentRehearsal(newValue));
     }
 
     private void updateComparator(Play newValue) {
@@ -71,12 +85,15 @@ public class RehearsalsPresenter implements Initializable {
         whoCellValueFactory.setComparator(comparator);
     }
 
-    public Void addRehearsal(Rehearsal rehearsal) {
-        model.getPlay();
+    public Boolean addRehearsal(Rehearsal rehearsal) {
+        model.getProbePlanerData().getReherarsals().add(rehearsal);
         rehearsals.getItems().add(rehearsal);
-
-        return null;
+        rehearsals.getSelectionModel().clearSelection();
+        rehearsals.getSelectionModel().select(rehearsal);
+        return Boolean.TRUE;
     }
 
-
+    public void currentRehearsalEdited() {
+        rehearsals.refresh();
+    }
 }

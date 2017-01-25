@@ -8,9 +8,11 @@ public class Rehearsal implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private final LocalDateTime startTime;
 	private final List<PartOfPlay> what;
-    private final String remark;
+    private LocalDateTime startTime;
+    private String remark;
+
+    private String who;
 
 	public Rehearsal(LocalDateTime startTime, List<PartOfPlay> what, String remark) {
 		this.startTime = startTime;
@@ -29,4 +31,21 @@ public class Rehearsal implements Serializable {
     public String getRemark() {
         return remark;
     }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getWho() {
+        return who;
+    }
+
+    public void setWho(String who) {
+        this.who = who;
+    }
+
 }

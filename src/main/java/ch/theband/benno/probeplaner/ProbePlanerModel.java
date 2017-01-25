@@ -22,6 +22,25 @@ import java.util.stream.Collectors;
 public class ProbePlanerModel {
     private final SimpleObjectProperty<Play> play = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<File> savedFile = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<ProbePlanerData> probePlanerData = new SimpleObjectProperty<>();
+
+    public Rehearsal getCurrentRehearsal() {
+        return currentRehearsal.get();
+    }
+
+    public SimpleObjectProperty<Rehearsal> currentRehearsalProperty() {
+        return currentRehearsal;
+    }
+
+    public void setCurrentRehearsal(Rehearsal currentRehearsal) {
+        this.currentRehearsal.set(currentRehearsal);
+    }
+
+    private final SimpleObjectProperty<Rehearsal> currentRehearsal = new SimpleObjectProperty<>();
+
+    public ProbePlanerModel() {
+        probePlanerData.addListener((p, o, n) -> setPlay(n.getPlay()));
+    }
 
     public Play getPlay() {
         return play.get();
@@ -45,6 +64,18 @@ public class ProbePlanerModel {
 
     public ObjectProperty<File> savedFileProperty() {
         return savedFile;
+    }
+
+    public ProbePlanerData getProbePlanerData() {
+        return probePlanerData.get();
+    }
+
+    public void setProbePlanerData(ProbePlanerData data) {
+        this.probePlanerData.set(data);
+    }
+
+    public ObjectProperty<ProbePlanerData> probePlanerDataProperty() {
+        return this.probePlanerData;
     }
 
 

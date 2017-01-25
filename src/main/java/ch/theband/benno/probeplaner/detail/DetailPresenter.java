@@ -3,21 +3,16 @@ package ch.theband.benno.probeplaner.detail;
 import ch.theband.benno.probeplaner.ProbePlanerModel;
 import ch.theband.benno.probeplaner.model.PartOfPlay;
 import ch.theband.benno.probeplaner.model.Rehearsal;
-import ch.theband.benno.probeplaner.model.Role;
-import ch.theband.benno.probeplaner.model.Scene;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
-import javafx.util.Callback;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class DetailPresenter {
 
@@ -31,8 +26,7 @@ public class DetailPresenter {
     private DatePicker date;
     @FXML
     private ComboBox<LocalTime> time;
-    private Callback<Rehearsal, Void> saveRehearsalCallback;
-    private List<PartOfPlay> scenes;
+    private Runnable currentRehearsalEditedListener;
 
     @FXML
     public void initialize() {
@@ -42,27 +36,68 @@ public class DetailPresenter {
         time.getItems().add(LocalTime.of(18, 30));
         time.getItems().add(LocalTime.of(19, 0));
         time.getItems().add(LocalTime.of(19, 30));
-        time.setValue(LocalTime.of(19, 30));
+        updateControls(null);
+
+        remark.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (model.getCurrentRehearsal() != null) model.getCurrentRehearsal().setRemark(newValue);
+            notifyCurrentRehearsalEdited();
+        });
+        who.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (model.getCurrentRehearsal() != null) model.getCurrentRehearsal().setWho(newValue);
+            notifyCurrentRehearsalEdited();
+        });
+        date.valueProperty().addListener((observable, oldValue, newValue) -> {
+            updateDateTime();
+        });
+
+        model.currentRehearsalProperty().addListener((obs, o, n) -> {
+            updateControls(n);
+        });
+    }
+
+    private void updateControls(Rehearsal rehearsal) {
+        if (rehearsal == null) {
+            date.setDisable(true);
+            date.setValue(null);
+            time.setDisable(true);
+            time.setValue(null);
+            who.setDisable(true);
+            who.setText(null);
+            remark.setDisable(true);
+            remark.setText(null);
+        } else {
+            List<PartOfPlay> scenes = rehearsal.getWhat();
+            date.setDisable(false);
+            date.setValue(rehearsal.getStartTime().toLocalDate());
+            time.setDisable(false);
+            time.setValue(rehearsal.getStartTime().toLocalTime());
+            who.setDisable(false);
+            who.setText(rehearsal.getWho());
+            remark.setDisable(false);
+            remark.setText(rehearsal.getRemark());
+        }
+    }
+
+    private void updateDateTime() {
+        if (model.getCurrentRehearsal() != null) {
+            if (date.getValue() != null && time.getValue() != null) {
+                model.getCurrentRehearsal().setStartTime(LocalDateTime.of(date.getValue(), time.getValue()));
+                notifyCurrentRehearsalEdited();
+            }
+        }
+    }
+
+    private void notifyCurrentRehearsalEdited() {
+        currentRehearsalEditedListener.run();
+    }
+
+    public void setCurrentRehearsalEditedListener(Runnable currentRehearsalEditedListener) {
+        this.currentRehearsalEditedListener = currentRehearsalEditedListener;
     }
 
     @FXML
     public void save() {
-        LocalDateTime when = LocalDateTime.of(date.getValue(), time.getValue());
-        Rehearsal rehearsal = new Rehearsal(when, scenes, remark.getText());
-        saveRehearsalCallback.call(rehearsal);
-
-
+        //todo lösche
     }
 
-    public void setSaveRehearsalCallback(Callback<Rehearsal, Void> saveRehearsalCallback) {
-        this.saveRehearsalCallback = saveRehearsalCallback;
-    }
-
-    public boolean createRehearsal(List<PartOfPlay> scenes) {
-        Stream<Role> roles = scenes.stream().filter(part -> part instanceof Scene).map(part -> (Scene) part).flatMap(scene -> scene.getPages().stream()).flatMap(page -> page.getLines().entrySet().stream()).filter(e -> e.getValue() != null && e.getValue() > 0).map(e -> e.getKey());
-        who.clear();
-        who.setText(roles.distinct().sorted(model.getPlay().rolesComparator()).map(Role::getName).collect(Collectors.joining(", ")));
-        this.scenes = scenes;
-        return true;
-    }
 }

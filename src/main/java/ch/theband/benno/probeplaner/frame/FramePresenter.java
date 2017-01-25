@@ -64,9 +64,8 @@ public class FramePresenter {
         west.setCenter(linesTableView.getView());
         east.getChildren().add(rehearsalsView.getView());
         chooser.setInitialDirectory(new File("."));
-
-        getLinesTablePresenter().setCreateRehearsalCallback(getDetailPresenter()::createRehearsal);
-        getDetailPresenter().setSaveRehearsalCallback(getRehearsalsPresenter()::addRehearsal);
+        getDetailPresenter().setCurrentRehearsalEditedListener(getRehearsalsPresenter()::currentRehearsalEdited);
+        getLinesTablePresenter().setCreateRehearsalCallback(getRehearsalsPresenter()::addRehearsal);
     }
 
     private LinesTablePresenter getLinesTablePresenter() {
@@ -138,7 +137,7 @@ public class FramePresenter {
         } else {
             saveService.reset();
             saveService.setFile(model.getSavedFile());
-            saveService.setPlay(model.getPlay());
+            saveService.setProbePlanerData(model.getProbePlanerData());
             saveService.start();
         }
     }
@@ -151,8 +150,8 @@ public class FramePresenter {
             openService.setFile(file);
             openService.start();
             openService.setOnSucceeded(evt -> {
-                model.setPlay(null);
-                model.setPlay(openService.getValue());
+
+                model.setProbePlanerData(openService.getValue());
                 model.setSavedFile(file);
             });
         }
@@ -164,7 +163,7 @@ public class FramePresenter {
 
     @FXML
     public void doNew() {
-        model.setPlay(null);
+        System.out.println("Not Implemented");
     }
 
     @FXML

@@ -1,8 +1,7 @@
 package ch.theband.benno.probeplaner.treetable;
 
 import ch.theband.benno.probeplaner.ProbePlanerModel;
-import ch.theband.benno.probeplaner.model.PartOfPlay;
-import ch.theband.benno.probeplaner.model.Play;
+import ch.theband.benno.probeplaner.model.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -19,8 +18,11 @@ import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class LinesTablePresenter {
 
@@ -37,7 +39,7 @@ public class LinesTablePresenter {
 
     @Inject
     ProbePlanerModel model;
-    private Callback<List<PartOfPlay>, Boolean> createRehearsal;
+    private Callback<Rehearsal, Boolean> createRehearsal;
 
     public void initialize() {
         model.playProperty().addListener((observable, oldValue, newValue) -> createTreeTable(newValue));
@@ -129,7 +131,7 @@ public class LinesTablePresenter {
 
     }
 
-    public void setCreateRehearsalCallback(Callback<List<PartOfPlay>, Boolean> createRehearsal) {
+    public void setCreateRehearsalCallback(Callback<Rehearsal, Boolean> createRehearsal) {
         this.createRehearsal = createRehearsal;
     }
 
@@ -171,8 +173,13 @@ public class LinesTablePresenter {
 
     @FXML
     public void createRehearsal() {
+
         List<PartOfPlay> scenes = model.getScenes(treeTable.getSelectionModel().getSelectedItems());
-        createRehearsal.call(scenes);
+        Rehearsal r = new Rehearsal(LocalDate.now().atTime(19, 30), scenes, "");
+        Stream<Role> roles = scenes.stream().filter(part -> part instanceof Scene).map(part -> (Scene) part).flatMap(scene -> scene.getPages().stream()).flatMap(page -> page.getLines().entrySet().stream()).filter(e -> e.getValue() != null && e.getValue() > 0).map(e -> e.getKey());
+        r.setWho(roles.distinct().sorted(model.getPlay().rolesComparator()).map(Role::getName).collect(Collectors.joining(", ")));
+
+        createRehearsal.call(r);
     }
 
     @FXML
