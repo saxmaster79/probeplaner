@@ -10,13 +10,13 @@ import com.google.common.collect.MultimapBuilder.ListMultimapBuilder;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,11 +27,6 @@ public class PdfFileExtractor extends Service<Play> {
     private final String path;
     private final int pageOffset;
 
-    public PdfFileExtractor() {
-        this("C:\\Users\\benno.bennoCompi\\Dropbox\\Georgsbühne\\No Body Like Jimmy.pdf", 5,
-                ImmutableSet.copyOf(Collections2.transform(Arrays.asList("Harri", "Rolf", "Sarah", "Bobi", "Diana", "Nick", "Jimmy", "Manuel", "Fabienne", "Viola", "Schöttli"), Role::new)));
-    }
-
     public PdfFileExtractor(String path, int pageOffset, ImmutableSet<Role> roles) {
         this.path = path;
         this.pageOffset = pageOffset;
@@ -40,16 +35,26 @@ public class PdfFileExtractor extends Service<Play> {
 
 
     private List<Act> convert(Multimap<Integer, Page> pages) {
-        Act act = new Act(1, "1. Akt");
+        int actNumber = 1;
+        Act act = new Act(actNumber, actNumber + ". Akt");
+        List<Act> acts = Lists.newArrayList(act);
         int previousPage = -1;
-        int sceneNumber = 1;
+        int sceneNumber = 0;//first scene is usually garbage...
         Scene scene = new Scene(sceneNumber, sceneNumber + ". Szene");
-        act.getScenes().add(scene);//first scene is usually garbage...
         for (Entry<Integer, Page> entry : pages.entries()) {
             ch.theband.benno.probeplaner.model.Page page = new ch.theband.benno.probeplaner.model.Page(entry.getKey());
-            page.getLines().putAll(entry.getValue().linesPerRole);
-            if (previousPage == entry.getKey()) {
-                sceneNumber++;
+            final Page internalPage = entry.getValue();
+            if (internalPage.newAct) {
+                act = new Act(++actNumber, actNumber + ". Akt");
+                acts.add(act);
+            }
+            page.getLines().putAll(internalPage.linesPerRole);
+            if (previousPage == entry.getKey() || internalPage.newAct) {
+                if (internalPage.newAct) {
+                    sceneNumber = 1;
+                } else {
+                    sceneNumber++;
+                }
                 scene = new Scene(sceneNumber, sceneNumber + ". Szene");
                 act.getScenes().add(scene);
             } else {
@@ -58,13 +63,13 @@ public class PdfFileExtractor extends Service<Play> {
             scene.getPages().add(page);
         }
 
-        return Lists.newArrayList(act);
+        return acts;
     }
 
-    private Page getPage(int i, int j, Multimap<Integer, Page> pages) {
+    private Page getPage(int i, int j, Multimap<Integer, Page> pages, boolean newAct) {
         Page page;
         if (pages.get(i).size() <= j) {
-            page = new Page(i, j);
+            page = new Page(i, newAct);
             pages.put(i, page);
         } else {
             page = Iterables.get(pages.get(i), j);
@@ -90,34 +95,34 @@ public class PdfFileExtractor extends Service<Play> {
             Multimap<Integer, Page> processDoc() throws IOException {
                 System.out.println(path);
                 // Reads in pdf document
-                PDDocument pdDoc = PDDocument.load(path);
+                PDDocument pdDoc = PDDocument.load(new File(path));
                 int numberOfPages = pdDoc.getNumberOfPages();
                 Multimap<Integer, Page> pages = ListMultimapBuilder.treeKeys().linkedListValues().build();
                 List<String> rows = new ArrayList<String>();
-                // rows.add(SZENE);
-                // rows.add(SEITE);
+
                 rows.addAll(roles.stream().map(x -> x.getName()).collect(Collectors.toList()));
                 int count = 0;
                 for (Role role : roles) {
                     String name = role.getName() + ":";
-                    for (int i = pageOffset; i <= numberOfPages; i++) {
+                    for (int pageNumber = pageOffset; pageNumber <= numberOfPages; pageNumber++) {
                         PDFTextStripper stripper = new PDFTextStripper();
-                        stripper.setStartPage(i);
-                        stripper.setEndPage(i);
+                        stripper.setStartPage(pageNumber);
+                        stripper.setEndPage(pageNumber);
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         try (OutputStreamWriter writer = new OutputStreamWriter(stream)) {
                             stripper.writeText(pdDoc, writer);
                             writer.flush();
                         }
-                        String[] szenen = stream.toString().split("Szene:");
+                        final String pageContent = stream.toString();
+                        String[] szenen = pageContent.split("Szene:");
 
-                        for (int j = 0; j < szenen.length; j++) {
-                            String daString = szenen[j];
+                        for (int sceneIndex = 0; sceneIndex < szenen.length; sceneIndex++) {
+                            String daString = szenen[sceneIndex];
                             int number = 0;
 
                             number = countMatches(daString, name);
 
-                            Page p = getPage(i, j, pages);
+                            Page p = getPage(pageNumber, sceneIndex, pages, daString.contains(". AKT"));
                             p.linesPerRole.put(role, number);
                         }
                     }
@@ -133,12 +138,11 @@ public class PdfFileExtractor extends Service<Play> {
     private static final class Page {
         private final Map<Role, Integer> linesPerRole = Maps.newHashMap();
         private final int number;
-        private final int sceneIndex;
-        private boolean changeOfScene;
+        private final boolean newAct;
 
-        public Page(int number, int sceneIndex) {
+        public Page(int number, boolean newAct) {
             this.number = number;
-            this.sceneIndex = sceneIndex;
+            this.newAct = newAct;
         }
 
         @Override
